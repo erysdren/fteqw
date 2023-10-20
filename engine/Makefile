@@ -709,9 +709,15 @@ endif
 # that can only make one assumption: SDL/AL are installed.
 # Dependencies like libjpeg9 don't exist everywhere.
 ifeq ($(FTE_TARGET),SDL2)
-	IMAGELDFLAGS:= libs-$(ARCH)/libpng.a libs-$(ARCH)/libjpeg.a
-	OGGVORBISLDFLAGS:= libs-$(ARCH)/libvorbisfile.a libs-$(ARCH)/libvorbis.a libs-$(ARCH)/libogg.a
-	BASE_CFLAGS+=-DLIBJPEG_STATIC -DLIBJPEG_STATIC -DLIBPNG_STATIC -DOPUS_STATIC -DSPEEX_STATIC -DFREETYPE_STATIC -DLIBVORBISFILE_STATIC
+	ifeq ($(COMPILE_SYS),Haiku)
+		IMAGELDFLAGS := $(shell $(PKGCONFIG) libpng libjpeg --libs)
+		OGGVORBISLDFLAGS := $(shell $(PKGCONFIG) vorbisfile vorbis ogg --libs)
+		BASE_CFLAGS += $(shell $(PKGCONFIG) libpng libjpeg vorbisfile vorbis ogg --cflags)
+	else
+		IMAGELDFLAGS:= libs-$(ARCH)/libpng.a libs-$(ARCH)/libjpeg.a
+		OGGVORBISLDFLAGS:= libs-$(ARCH)/libvorbisfile.a libs-$(ARCH)/libvorbis.a libs-$(ARCH)/libogg.a
+		BASE_CFLAGS+=-DLIBJPEG_STATIC -DLIBJPEG_STATIC -DLIBPNG_STATIC -DOPUS_STATIC -DSPEEX_STATIC -DFREETYPE_STATIC -DLIBVORBISFILE_STATIC
+	endif
 endif
 
 VPATH := $(BASE_DIR) : $(CLIENT_DIR) : $(GL_DIR) : $(SW_DIR) : $(COMMON_DIR) : $(SERVER_DIR) : $(HTTP_DIR) : $(QUX_DIR) : $(PROGS_DIR) : $(D3D_DIR) : $(VK_DIR) : $(BASE_DIR)/web
