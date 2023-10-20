@@ -1027,6 +1027,7 @@ else
     #we're using system libraries... lets hope pkg-config knows it and can handle any cross compiles.
     FREETYPE_CFLAGS:=$(shell $(PKGCONFIG) freetype2 --cflags --silence-errors)
     FREETYPE_LDFLAGS:=$(shell $(PKGCONFIG) freetype2 --libs --silence-errors)
+	$(error fyucke)
     ifeq (,$(FREETYPE_CFLAGS))
         #system freetype headers not installed. don't try to include them!
         FREETYPE_CFLAGS:=-DNO_FREETYPE
