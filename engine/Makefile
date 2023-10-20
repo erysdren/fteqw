@@ -710,8 +710,9 @@ endif
 # Dependencies like libjpeg9 don't exist everywhere.
 ifeq ($(FTE_TARGET),SDL2)
 	ifeq ($(COMPILE_SYS),Haiku)
-		IMAGELDFLAGS := $(shell $(PKGCONFIG) libpng --variable=libdir)/libpng.a $(shell $(PKGCONFIG) libjpeg --variable=libdir)/libjpeg.a
-		OGGVORBISLDFLAGS := $(shell $(PKGCONFIG) vorbisfile --variable=libdir)/libvorbisfile.a $(shell $(PKGCONFIG) vorbis --variable=libdir)/libvorbis.a $(shell $(PKGCONFIG) ogg --variable=libdir)/libogg.a
+		IMAGELDFLAGS := $(shell $(PKGCONFIG) libpng libjpeg --libs)
+		OGGVORBISLDFLAGS := $(shell $(PKGCONFIG) vorbisfile vorbis ogg --libs)
+		BASE_CFLAGS += $(shell $(PKGCONFIG) libjpeg libpng opus speex freetype2 vorbisfile vorbis ogg --cflags)
 	else
 		IMAGELDFLAGS:= libs-$(ARCH)/libpng.a libs-$(ARCH)/libjpeg.a
 		OGGVORBISLDFLAGS:= libs-$(ARCH)/libvorbisfile.a libs-$(ARCH)/libvorbis.a libs-$(ARCH)/libogg.a
