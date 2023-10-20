@@ -1015,10 +1015,6 @@ else
 endif
 
 #freetype is annoying.
-ifeq (1,$(LINK_FREETYPE))
-    CLIENTLIBFLAGS+=-DFREETYPE_STATIC
-    CLIENTLDDEPS+=$(FREETYPE_LDFLAGS)
-endif
 ifneq ("$(wildcard $(ARCHLIBS))","")
     #makelibs has been used. we know what to use here.
     FREETYPE_CFLAGS:=
@@ -1032,6 +1028,10 @@ else
         FREETYPE_CFLAGS:=-DNO_FREETYPE
         FREETYPE_LDFLAGS:=
     endif
+endif
+ifeq (1,$(LINK_FREETYPE))
+    CLIENTLIBFLAGS+=$(FREETYPE_CFLAGS)
+    CLIENTLDDEPS+=$(FREETYPE_LDFLAGS)
 endif
 ALL_CFLAGS+=$(FREETYPE_CFLAGS)
 
