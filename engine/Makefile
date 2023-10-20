@@ -1028,7 +1028,6 @@ else
         FREETYPE_CFLAGS:=-DNO_FREETYPE
         FREETYPE_LDFLAGS:=
     endif
-    $(error FREETYPE_CFLAGS = $(FREETYPE_CFLAGS))
 endif
 ifeq (1,$(LINK_FREETYPE))
     CLIENTLIBFLAGS+=$(FREETYPE_CFLAGS)
@@ -1490,6 +1489,17 @@ ifeq ($(FTE_TARGET),bsd)
 		M_LDFLAGS+= -lz
 	endif
 endif
+
+# haiku
+ifeq ($(COMPILE_SYS),Haiku)
+	GL_LDFLAGS+= $(shell $(PKGCONFIG) freetype2 --libs)
+	VK_LDFLAGS+= $(shell $(PKGCONFIG) freetype2 --libs)
+	M_LDFLAGS+= $(shell $(PKGCONFIG) freetype2 --libs)
+	M_CFLAGS+= $(shell $(PKGCONFIG) freetype2 --cflags)
+	VK_CFLAGS+= $(shell $(PKGCONFIG) freetype2 --cflags)
+	GL_CFLAGS+= $(shell $(PKGCONFIG) freetype2 --cflags)
+endif
+
 ifneq (,$(findstring linux,$(FTE_TARGET)))
 	SV_DIR=sv_linux$(BITS)
 	SV_EXE_NAME=../$(EXE_NAME)-sv$(BITS)
