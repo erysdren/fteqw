@@ -713,6 +713,7 @@ ifeq ($(FTE_TARGET),SDL2)
 		IMAGELDFLAGS := $(shell $(PKGCONFIG) libpng libjpeg --libs)
 		OGGVORBISLDFLAGS := $(shell $(PKGCONFIG) vorbisfile vorbis ogg --libs)
 		BASE_CFLAGS += $(shell $(PKGCONFIG) libjpeg libpng opus speex freetype2 vorbisfile vorbis ogg --cflags)
+		GL_CFLAGS += $(shell $(PKGCONFIG) freetype2 --cflags)
 	else
 		IMAGELDFLAGS:= libs-$(ARCH)/libpng.a libs-$(ARCH)/libjpeg.a
 		OGGVORBISLDFLAGS:= libs-$(ARCH)/libvorbisfile.a libs-$(ARCH)/libvorbis.a libs-$(ARCH)/libogg.a
