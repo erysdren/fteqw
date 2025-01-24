@@ -1049,6 +1049,18 @@ IF(FTE_PLUG_QUAKE3)
 	ENDIF()
 ENDIF()
 
+SET(FTE_PLUG_ROTT true CACHE BOOL "Compile Rise of the Triad plugin.")
+IF(FTE_PLUG_ROTT)
+	ADD_LIBRARY(plug_rott MODULE
+		plugins/rott/fs_rott.c
+		plugins/rott/mod_rott.c
+		plugins/rott/rott.c
+		plugins/plugin.c)
+	SET_TARGET_PROPERTIES(plug_rott PROPERTIES COMPILE_DEFINITIONS "${FTE_LIB_DEFINES};${FTE_REVISON};FTEPLUGIN")
+	TARGET_LINK_LIBRARIES(plug_rott ${SYS_LIBS})
+	EMBED_PLUGIN_META(rott "ROTT Formats" "Provides compatability with Rise of the Triad's file formats.")
+ENDIF()
+
 #still a wip, so disabled by default
 SET(FTE_PLUG_COD true CACHE BOOL "Compile Call of Duty plugin.")
 IF(FTE_PLUG_COD)
