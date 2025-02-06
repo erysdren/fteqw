@@ -66,6 +66,42 @@ static void *GLVID_getsdlglfunction(char *functionname)
 }
 #endif
 
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+static SDL_PixelFormat uploadfmt_to_pixelformat(uploadfmt_t format)
+{
+	switch(format)
+	{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+		case PTI_LLLX8:
+		case PTI_RGBX8:
+			return SDL_PIXELFORMAT_XBGR8888;
+		case PTI_LLLA8:
+		case PTI_RGBA8:
+			return SDL_PIXELFORMAT_ABGR8888;
+		case PTI_BGRX8:
+			return SDL_PIXELFORMAT_XRGB8888;
+		case PTI_BGRA8:
+			return SDL_PIXELFORMAT_ARGB8888;
+#else
+		case PTI_LLLX8:
+		case PTI_RGBX8:
+			return SDL_PIXELFORMAT_RGBX8888;
+		case PTI_LLLA8:
+		case PTI_RGBA8:
+			return SDL_PIXELFORMAT_RGBA8888;
+		case PTI_BGRX8:
+			return SDL_PIXELFORMAT_BGRX8888;
+		case PTI_BGRA8:
+			return SDL_PIXELFORMAT_BGRA8888;
+#endif
+		case PTI_A2BGR10:
+			return SDL_PIXELFORMAT_ABGR2101010;
+		default:
+			return SDL_PIXELFORMAT_UNKNOWN;
+	}
+}
+#endif
+
 #if SDL_VERSION_ATLEAST(2,0,0)
 void *GLVID_CreateCursor			(const qbyte *imagedata, int width, int height, uploadfmt_t format, float hotx, float hoty, float scale)
 {
@@ -153,17 +189,33 @@ void *GLVID_CreateCursor			(const qbyte *imagedata, int width, int height, uploa
 
 		nd = Image_ResampleTexture(format, imagedata, width, height, NULL, nw, nh);
 
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		surf = SDL_CreateSurfaceFrom(nw, nh, uploadfmt_to_pixelformat(format), nd, nw*4);
+#else
 		surf = SDL_CreateRGBSurfaceFrom(nd, nw, nh, 32, nw*4, r, g, b, a);
+#endif
 		curs = SDL_CreateColorCursor(surf, hotx, hoty);
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		SDL_DestroySurface(surf);
+#else
 		SDL_FreeSurface(surf);
+#endif
 
 		BZ_Free(nd);
 	}
 	else
 	{
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		surf = SDL_CreateSurfaceFrom(width, height, uploadfmt_to_pixelformat(format), (void*)imagedata, width*4);
+#else
 		surf = SDL_CreateRGBSurfaceFrom((void*)imagedata, width, height, 32, width*4, r, g, b, a);
+#endif
 		curs = SDL_CreateColorCursor(surf, hotx, hoty);
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		SDL_DestroySurface(surf);
+#else
 		SDL_FreeSurface(surf);
+#endif
 	}
 	return curs;
 }
@@ -174,7 +226,11 @@ qboolean GLVID_SetCursor			(void *cursor)
 }
 void GLVID_DestroyCursor			(void *cursor)
 {
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	SDL_DestroyCursor(cursor);
+#else
 	SDL_FreeCursor(cursor);
+#endif
 }
 
 static void GLVID_SetIcon				(void)
@@ -221,6 +277,10 @@ static void GLVID_SetIcon				(void)
 				imagewidth = 64;
 				imageheight = 64;
 			}*/
+
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+			iconsurf = SDL_CreateSurfaceFrom(imagewidth, imageheight, uploadfmt_to_pixelformat(format), imagedata, 4*imagewidth);
+#else
 			switch(format)
 			{
 			case PTI_LLLA8:		//fallthrough
@@ -233,6 +293,7 @@ static void GLVID_SetIcon				(void)
 			default:	//others shouldn't happen.
 				break;
 			}
+#endif
 		}
 	}
 
@@ -240,10 +301,18 @@ static void GLVID_SetIcon				(void)
 	{
 		#include "fte_eukara64.h"
 //		#include "bymorphed.h"
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+		iconsurf = SDL_CreateSurfaceFrom(icon.width, icon.height, uploadfmt_to_pixelformat(PTI_RGBA8), (void*)icon.pixel_data, 4*icon.width);
+#else
 		iconsurf = SDL_CreateRGBSurfaceFrom((void*)icon.pixel_data, icon.width, icon.height, 32, 4*icon.width, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);	//RGBA byte order on a little endian machine, at least...
+#endif
 	}
 	SDL_SetWindowIcon(sdlwindow, iconsurf);
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	SDL_DestroySurface(iconsurf);
+#else
 	SDL_FreeSurface(iconsurf);
+#endif
 	Z_Free(imagedata);
 }
 
@@ -251,8 +320,34 @@ static void GLVID_SetIcon				(void)
 //So we can use eg VGA-0 on linux and get the proper device.
 static int SDLVID_GetVideoDevice(const char *devicename)
 {
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	SDL_DisplayID *displays;
+	int num_displays;
+#endif
 	char *end;
 	int display = strtol(devicename, &end, 0);
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	displays = SDL_GetDisplays(&num_displays);
+	if (*end)
+	{	//okay, so its not purely a number. scan by name
+		display = num_displays;
+		if (display)
+		{
+			while (display --> 0)
+			{
+				const char *dname = SDL_GetDisplayName(displays[display]);
+				if (dname && !Q_strcasecmp(dname, devicename))
+					break;
+			}
+		}
+	}
+	else
+	{
+		if (display < 0 || display >= num_displays)
+			display = 0;
+	}
+	SDL_free(displays);
+#else
 	if (*end)
 	{	//okay, so its not purely a number. scan by name
 		display = SDL_GetNumVideoDisplays();
@@ -271,6 +366,7 @@ static int SDLVID_GetVideoDevice(const char *devicename)
 		if (display < 0 || display >= SDL_GetNumVideoDisplays())
 			display = 0;
 	}
+#endif
 	return display;
 }
 static qboolean SDLVID_GetVideoMode(rendererstate_t *info, int *display, SDL_DisplayMode *mode)
@@ -329,7 +425,7 @@ static qboolean SDLVID_Init (rendererstate_t *info, unsigned char *palette, r_qr
 #endif
 #endif
 
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE);
+	SDL_Init(SDL_INIT_VIDEO);
 #if !defined(FTE_TARGET_WEB) && !SDL_VERSION_ATLEAST(2,0,0)
 	SDL_SetVideoMode(0, 0, 0, 0);	//to get around some SDL bugs
 #endif
