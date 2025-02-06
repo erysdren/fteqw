@@ -1105,6 +1105,10 @@ endif
 
 #the defaults for sdl come first
 #CC_MACHINE:=$(shell $(CC) -dumpmachine)
+ifeq ($(FTE_TARGET),SDL3)
+    SDLCONFIG?=$(PKGCONFIG) sdl3
+    FTE_FULLTARGET?=sdl3$(BITS)
+endif
 ifeq ($(FTE_TARGET),SDL2)
     SDLCONFIG?=sdl2-config
     FTE_FULLTARGET?=sdl2$(BITS)
