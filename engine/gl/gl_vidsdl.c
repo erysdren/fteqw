@@ -1,7 +1,11 @@
 #include "quakedef.h"
 
+#if FTE_SDL == 3
+#include <SDL3/SDL.h>
+#else
 #include <SDL.h>
 #include <SDL_syswm.h>
+#endif
 
 #ifdef GLQUAKE
 	#include "glquake.h"
