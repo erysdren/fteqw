@@ -1049,6 +1049,16 @@ IF(FTE_PLUG_QUAKE3)
 	ENDIF()
 ENDIF()
 
+SET(FTE_PLUG_SATURN true CACHE BOOL "Compile Saturn plugin.")
+IF(FTE_PLUG_SATURN)
+	ADD_LIBRARY(plug_saturn MODULE
+		plugins/saturn/saturn.c
+		plugins/plugin.c)
+	SET_TARGET_PROPERTIES(plug_saturn PROPERTIES COMPILE_DEFINITIONS "${FTE_LIB_DEFINES};${FTE_REVISON};FTEPLUGIN")
+	TARGET_LINK_LIBRARIES(plug_saturn ${SYS_LIBS})
+	EMBED_PLUGIN_META(saturn "Saturn Formats" "Provides compatability with Sega Saturn Quake's file formats.")
+ENDIF()
+
 #still a wip, so disabled by default
 SET(FTE_PLUG_COD true CACHE BOOL "Compile Call of Duty plugin.")
 IF(FTE_PLUG_COD)
@@ -1596,6 +1606,19 @@ IF(FTE_PLUG_HL2)
 	TARGET_LINK_LIBRARIES(plug_hl2 ${SYS_LIBS} ${ZLIB_LIBRARIES})
 
 	EMBED_PLUGIN_META(hl2 "HalfLife2 Formats Plugin" "Adds support for reading various file formats used by HalfLife2. Requires mod support to be useful.")
+ENDIF()
+
+#sega saturn quake
+SET(FTE_PLUG_SATURN true CACHE BOOL "Compile support for Sega Saturn Quake file formats.")
+IF(FTE_PLUG_SATURN)
+	ADD_LIBRARY(plug_saturn MODULE
+		plugins/plugin.c
+		plugins/saturn/saturn.c
+	)
+	SET_TARGET_PROPERTIES(plug_saturn PROPERTIES COMPILE_DEFINITIONS "FTEPLUGIN;MULTITHREAD;${FTE_LIB_DEFINES}")
+	TARGET_LINK_LIBRARIES(plug_saturn ${SYS_LIBS})
+
+	EMBED_PLUGIN_META(saturn "Saturn Formats Plugin" "Provides support for various formats used by Quake for the Sega Saturn.")
 ENDIF()
 
 #model formats plugin

@@ -523,7 +523,13 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
-
+######################################
+#for compat with sega saturn quake's file formats
+$(PLUG_PREFIX)saturn$(PLUG_NATIVE_EXT): saturn/saturn.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,saturn,$@,Saturn Formats,Provides support for various formats used by Quake for the Sega Saturn.)
+NATIVE_PLUGINS+=saturn
+######################################
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
 ######################################
