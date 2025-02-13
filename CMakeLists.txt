@@ -1534,6 +1534,19 @@ IF(FTE_PLUG_HL2)
 	EMBED_PLUGIN_META(hl2 "HalfLife2 Formats Plugin" "Adds support for reading various file formats used by HalfLife2. Requires mod support to be useful.")
 ENDIF()
 
+#sega saturn quake
+SET(FTE_PLUG_SATURN true CACHE BOOL "Compile support for Sega Saturn Quake file formats.")
+IF(FTE_PLUG_SATURN)
+	ADD_LIBRARY(plug_saturn MODULE
+		plugins/plugin.c
+		plugins/saturn/saturn.c
+	)
+	SET_TARGET_PROPERTIES(plug_saturn PROPERTIES COMPILE_DEFINITIONS "FTEPLUGIN;MULTITHREAD;${FTE_LIB_DEFINES}")
+	TARGET_LINK_LIBRARIES(plug_saturn ${SYS_LIBS})
+
+	EMBED_PLUGIN_META(saturn "Saturn Formats Plugin" "Provides support for various formats used by Quake for the Sega Saturn.")
+ENDIF()
+
 #model formats plugin
 SET(FTE_PLUG_MODELS true CACHE BOOL "Compile models formats plugin.")
 IF(FTE_PLUG_MODELS)
