@@ -11,6 +11,22 @@
 static plugfsfuncs_t *filefuncs = NULL;
 static plugmodfuncs_t *modfuncs = NULL;
 
+/* plugins are silly huh */
+quint32_t SwapU32(quint32_t l)
+{
+	return
+		((l>>24)&0x000000ff)|
+		((l>> 8)&0x0000ff00)|
+		((l<< 8)&0x00ff0000)|
+		((l<<24)&0xff000000);
+}
+
+#if defined(FTE_BIG_ENDIAN)
+#define BigU32(x) x
+#else
+#define BigU32(x) SwapU32(x)
+#endif
+
 typedef struct lev_header {
 	quint32_t mUnknown1; //always 0?
 	quint32_t mUnknown2; //might represent a bank or collective size
@@ -31,7 +47,19 @@ typedef struct lev_header {
 
 static qboolean QDECL Mod_LoadSaturnLEV(struct model_s *mod, void *buffer, size_t fsize)
 {
-	return false;
+	int i;
+	lev_header_t *header;
+
+	/* skip sky data to header */
+	header = (lev_header_t *)((qbyte *)buffer + 131104);
+
+	/* swap header data */
+	for (i = 0; i < 15; i++)
+		*((quint32_t *)header + i) = BigU32(*((quint32_t *)header + i));
+
+	mod->type = mod_alias;
+
+	return true;
 }
 
 qboolean Plug_Init(void)
