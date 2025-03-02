@@ -45,6 +45,16 @@ typedef struct lev_header {
 	quint32_t mUnknownCount; //16 bytes each
 } lev_header_t;
 
+struct SLevNode
+{
+	int16		mResv[2]; //always 0
+	int16		mPos[3];
+	int16		mDistance; //unverified, could be some kind of angle or axis offset
+	uint16		mFirstPlane;
+	uint16		mLastPlane;
+	int16		mUnknown[6];
+};
+
 static qboolean QDECL Mod_LoadSaturnLEV(struct model_s *mod, void *buffer, size_t fsize)
 {
 	int i;
