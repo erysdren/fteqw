@@ -1214,6 +1214,10 @@ MSV_OpenUserDatabase();
 	else if (PR_LoadLua())
 		newgametype = GT_LUA;
 #endif
+#ifdef VM_WASM
+	else if (PR_LoadWASM())
+		newgametype = GT_WASM;
+#endif
 #ifdef VM_Q1
 	else if (PR_LoadQ1QVM())
 		newgametype = GT_Q1QVM;
