@@ -2,6 +2,7 @@
 build
 *.o
 *.o.d
+*.wasm
 engine/debug/
 engine/release/
 engine/libs-*/

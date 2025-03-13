@@ -1,0 +1,72 @@
+package fteqw:qwprogs;
+
+world qwprogs {
+	export qwprogs: interface {
+
+		type entity = u32;
+
+		record vector {
+			x: f32,
+			y: f32,
+			z: f32,
+		}
+
+		record axis {
+			forward: vector,
+			up: vector,
+			right: vector,
+		}
+
+		record trace {
+			allsolid: f32,
+			startsolid: f32,
+			fraction: f32,
+			endpos: vector,
+			planenormal: vector,
+			planedist: f32,
+			ent: entity,
+			inopen: f32,
+			inwater: f32,
+			endcontentsf: f32,
+			endcontentsi: s32,
+			surfaceflagsf: f32,
+			surfaceflagsi: s32,
+		}
+
+		record globals {
+			self: entity,
+			other: entity,
+			%world: entity,
+			time: f32,
+			frametime: f32,
+			newmis: entity,
+			forceretouch: f32,
+			mapname: string,
+			deathmatch: f32,
+			coop: f32,
+			teamplay: f32,
+			serverflags: f32,
+			dimensionsend: f32,
+			physicsmode: f32,
+			totalsecrets: f32,
+			totalmonsters: f32,
+			foundsecrets: f32,
+			killedmonsters: f32,
+			cyclewrapped: f32,
+			msgentity: entity,
+			dimensiondefault: f32,
+			globalgravitydir: vector,
+			startspot: string,
+		}
+
+		startframe: func();
+		playerprethink: func();
+		playerpostthink: func();
+		clientkill: func();
+		clientconnect: func();
+		putclientinserver: func();
+		clientdisconnect: func();
+		setnewparms: func();
+		setchangeparms: func();
+	}
+}

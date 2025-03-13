@@ -912,6 +912,9 @@ typedef enum {
 #ifdef VM_LUA
 	GT_LUA,		//for the luls
 #endif
+#ifdef VM_WASM
+	GT_WASM,
+#endif
 	GT_MAX
 } gametype_e;
 

@@ -99,6 +99,7 @@ SPEEXDSPVER=1.2.0
 FREETYPEVER=2.10.1
 BULLETVER=2.87
 OPENSSLVER=3.0.1
+WAMRVER=2.4.3
 
 #cygwin's make's paths confuses non-cygwin things
 RELEASE_DIR=$(BASE_DIR)/release
@@ -869,6 +870,7 @@ SERVER_OBJS = 		\
 	pr_cmds.o 		\
 	pr_q1qvm.o	\
 	pr_lua.o	\
+	pr_wasm.o	\
 	sv_master.o 	\
 	sv_init.o 		\
 	sv_main.o 		\
@@ -1124,6 +1126,10 @@ else
     ALL_CFLAGS+=-DNO_GNUTLS
 endif
 
+ifeq (1,$(USE_WASM))
+    MAKELIBS+=libs-$(ARCH)/libiwasm.a
+    ALL_CFLAGS+=-DVM_WASM
+endif
 
 #the defaults for sdl come first
 #CC_MACHINE:=$(shell $(CC) -dumpmachine)
@@ -2549,6 +2555,10 @@ libs-$(ARCH)/libBulletDynamics.a:
 libs-$(ARCH)/vulkan/vulkan.h:
 	test -f vulkan-sdk-$(VULKANVER).tar.gz || wget https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/vulkan-sdk-$(VULKANVER).tar.gz  
 	cd libs-$(ARCH) && tar -xvzf ../vulkan-sdk-$(VULKANVER).tar.gz --strip-components=2 Vulkan-Headers-vulkan-sdk-$(VULKANVER)/include/
+
+libs-$(ARCH)/libiwasm.a:
+	test -f wasm-micro-runtime-$(WAMRVER).tar.gz || wget https://github.com/bytecodealliance/wasm-micro-runtime/archive/refs/tags/WAMR-$(WAMRVER).tar.gz -O wasm-micro-runtime-$(WAMRVER).tar.gz
+	test -f libs-$(ARCH)/libiwasm.a || (mkdir -p libs-$(ARCH) && cd libs-$(ARCH) && tar -xvzf ../wasm-micro-runtime-$(WAMRVER).tar.gz && cd wasm-micro-runtime-WAMR-$(WAMRVER) && CFLAGS="$(CFLAGS) -Os" $(TOOLOVERRIDES) $(DO_CMAKE) -DWAMR_BUILD_AOT=0 -DWAMR_BUILD_LIBC_BUILTIN=0 -DWAMR_BUILD_LIBC_WASI=0 -DWAMR_BUILD_SIMD=0 . && $(TOOLOVERRIDES) $(MAKE) vmlib && cp libiwasm.a core/iwasm/include/wasm_export.h core/iwasm/include/lib_export.h ..)
 
 ifeq ($(FTE_TARGET),web)
 makelibs: libs-$(ARCH)/libz.a $(MAKELIBS)
