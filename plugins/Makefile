@@ -464,10 +464,10 @@ NATIVE_PLUGINS+=ezhud
 
 ######################################
 #not really relevant now that gltf was made an internal plugin
-$(PLUG_PREFIX)models$(PLUG_NATIVE_EXT): models/gltf.c models/exportiqm.c models/models.c plugin.c ../engine/common/json.c
+$(PLUG_PREFIX)models$(PLUG_NATIVE_EXT): models/gltf.c models/dnxm.c models/cpj.c models/exportiqm.c models/models.c plugin.c ../engine/common/json.c
 	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) -Imodels $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
 	$(call EMBEDMETA,models,$@,Models Plugin,Kinda redundant now that the engine has gltf2 loading)
-#NATIVE_PLUGINS+=models
+NATIVE_PLUGINS+=models
 ######################################
 
 ######################################

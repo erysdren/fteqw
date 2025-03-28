@@ -23,6 +23,12 @@ static struct plugin_s *q3plug;
 #ifdef MODELFMT_GLTF
 	#include "../plugins/models/gltf.c"
 #endif
+#ifdef MODELFMT_CPJ
+	#include "../plugins/models/cpj.c"
+#endif
+#ifdef MODELFMT_DNXM
+	#include "../plugins/models/dnxm.c"
+#endif
 #ifdef USE_INTERNAL_ODE
 	#include "../engine/common/com_phys_ode.c"
 #endif
@@ -55,6 +61,12 @@ static struct
 #endif
 #if defined(MODELFMT_GLTF)
 	{"GLTF", Plug_GLTF_Init},
+#endif
+#if defined(MODELFMT_CPJ)
+	{"CPJ", Plug_CPJ_Init},
+#endif
+#if defined(MODELFMT_DNXM)
+	{"DNXM", Plug_DNXM_Init},
 #endif
 
 #ifdef STATIC_OPENSSL
