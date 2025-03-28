@@ -1605,6 +1605,8 @@ IF(FTE_PLUG_MODELS)
 		plugins/plugin.c
 		plugins/models/models.c
 		plugins/models/gltf.c
+		plugins/models/dnxm.c
+		plugins/models/cpj.c
 		${DRACO_FILES}
 		engine/common/json.c
 		plugins/models/exportiqm.c

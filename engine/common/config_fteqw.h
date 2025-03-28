@@ -86,6 +86,8 @@
 #define MODELFMT_MDX			//kingpin's format (for hitboxes+geomsets).
 #define MODELFMT_OBJ			//lame mesh-only format that needs far too much processing and even lacks a proper magic identifier too
 #define MODELFMT_GLTF			//khronos 'transmission format'. .gltf or .glb extension. PBR. Version 2 only, for now.
+#define MODELFMT_DNXM			//3d realms duke nukem extended model
+#define MODELFMT_CPJ			//3d realms cannibal project model
 #define RAGDOLL					//ragdoll support. requires RBE support (via a plugin...).
 
 //Image formats
