@@ -1602,7 +1602,7 @@ static int QDECL COM_Dir_List(const char *name, qofs_t size, time_t mtime, void 
 		else if (!Q_strcasecmp(ext, "bsp") || !Q_strcasecmp(ext, "spr") || !Q_strcasecmp(ext, "sp2") || !Q_strcasecmp(ext, "mdl") || !Q_strcasecmp(ext, "md3") || !Q_strcasecmp(ext, "iqm") ||
 				 !Q_strcasecmp(ext, "vvm") || !Q_strcasecmp(ext, "psk") || !Q_strcasecmp(ext, "dpm") || !Q_strcasecmp(ext, "zym") || !Q_strcasecmp(ext, "md5mesh") ||
 				 !Q_strcasecmp(ext, "mdx") || !Q_strcasecmp(ext, "md2") || !Q_strcasecmp(ext, "obj") || !Q_strcasecmp(ext, "mds") || !Q_strcasecmp(ext, "mdc") ||
-				 !Q_strcasecmp(ext, "md5anim") || !Q_strcasecmp(ext, "gltf") || !Q_strcasecmp(ext, "glb") || !Q_strcasecmp(ext, "ase") || !Q_strcasecmp(ext, "lwo") ||
+				 !Q_strcasecmp(ext, "md5anim") || !Q_strcasecmp(ext, "gltf") || !Q_strcasecmp(ext, "glb") || !Q_strcasecmp(ext, "ase") || !Q_strcasecmp(ext, "lwo") || !Q_strcasecmp(ext, "cpj") ||
 				 ((!Q_strncasecmp(name, "xmodel/", 7)||!Q_strncasecmp(name, "xanim/", 6)) && !Q_strcasecmp(ext, ""))	//urgh
 				 )
 			Q_snprintfz(link, sizeof(link), "\\tip\\Open in Model Viewer\\modelviewer\\%s", name);
