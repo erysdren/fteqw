@@ -5673,7 +5673,7 @@ static void FS_ReloadPackFiles_f(void)
 		FS_BeginManifestUpdates();
 }
 
-#ifdef NOSTDIO
+#if defined(NOSTDIO) || defined(__DJGPP__)
 qboolean Sys_DoDirectoryPrompt(char *basepath, size_t basepathsize, const char *poshname, const char *savedname)
 {
 	return false;
@@ -5938,7 +5938,7 @@ qboolean Sys_FindGameData(const char *poshname, const char *gamename, char *base
 
 	return false;
 }
-#else
+#elif !defined(__DJGPP__)
 #if defined(__linux__) || defined(__unix__) || defined(__apple__)
 #include <sys/stat.h>
 
@@ -8208,7 +8208,7 @@ static qboolean FS_GetBestHomeDir(ftemanifest_t *manifest)
 
 	return false;
 }
-#elif defined(NOSTDIO)
+#elif defined(NOSTDIO) || defined(__DJGPP__)
 static qboolean FS_GetBestHomeDir(ftemanifest_t *man)
 {	//no studio? webgl port? no file system access = no homedirs!
 	return false;

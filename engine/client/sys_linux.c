@@ -67,7 +67,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #undef malloc
 
 static int noconinput = 0;
-static int nostdout = 0;
+int nostdout = 0;
 
 static FILE *dedcon; //replaces our stdin/out when set.
 static int dedconproc = -1;
@@ -88,6 +88,7 @@ qboolean Sys_InitTerminal (void)	//we either have one or we don't.
 	if (isatty(STDIN_FILENO))
 		return true;	//already attached to a terminal in some form. don't need another.
 
+#ifndef __DJGPP__
 	if (dedcon)	//already got one open... shouldn't really happen. future paranoia.
 		return true;
 	else
@@ -141,6 +142,7 @@ qboolean Sys_InitTerminal (void)	//we either have one or we don't.
 			close(pty);
 		}
 	}
+#endif
 	return false;	//nope, soz
 }
 void Sys_CloseTerminal (void)
