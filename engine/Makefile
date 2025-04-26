@@ -452,7 +452,7 @@ ifeq ($(FTE_TARGET),dos)
 	CC=i586-pc-msdosdjgpp-gcc
 	CXX=i586-pc-msdosdjgpp-g++
 	STRIP=i586-pc-msdosdjgpp-strip
-	CFLAGS+=-DNO_ZLIB
+	CFLAGS+=-DNO_ZLIB -Wno-attributes
 endif
 
 #if you have an x86, you can get gcc to build binaries using 3 different ABIs, instead of builds for just the default ABI

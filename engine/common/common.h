@@ -504,6 +504,12 @@ void COM_BiDi_Shutdown(void);
 //small macro to tell COM_ParseFunString (and related functions like con_printf) that the input is a utf-8 string.
 #define U8(s) "^`u8:" s "`="
 
+#if defined(FTE_TARGET_WEB) || defined(__DJGPP__)
+//targets that don't support towupper/towlower...
+#define towupper Q_towupper
+#define towlower Q_towlower
+#endif
+
 //handles whatever charset is active, including ^U stuff.
 unsigned int unicode_byteofsfromcharofs(const char *str, unsigned int charofs, qboolean markup);
 unsigned int unicode_charofsfrombyteofs(const char *str, unsigned int byteofs, qboolean markup);
