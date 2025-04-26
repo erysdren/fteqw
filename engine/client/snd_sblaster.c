@@ -470,11 +470,13 @@ static qboolean SBLASTER_InitCard(soundcardinfo_t *sc, const char *pcmname)
 //
 	if (!GetBLASTER())
 	{
+#if 0
 		Con_NotifyBox (
 		"The BLASTER environment variable\n"
 		"is not set, sound effects are\n"
 		"disabled.  See README.TXT for help.\n"
 		);			
+#endif
 		return 0;
 	}
 

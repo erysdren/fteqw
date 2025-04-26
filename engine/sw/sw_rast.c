@@ -1004,7 +1004,7 @@ qboolean SW_SCR_UpdateScreen(void)
 		R2D_BrightenScreen();
 	}
 
-	SCR_DrawTwoDimensional(0, 0);
+	SCR_DrawTwoDimensional(0);
 
 	V_UpdatePalette (false);
 	return true;

@@ -121,7 +121,7 @@ void Sys_SendKeyEvents(void)
 	}
 }
 
-void INS_Move(float *movements, int pnum)
+void INS_Move(void)
 {
 }
 void INS_Commands(void)
@@ -182,4 +182,21 @@ void INS_EnumerateDevices(void *ctx, void(*callback)(void *ctx, const char *type
 void Sys_Sleep (double seconds)
 {
 	usleep(seconds * 1000000);
+}
+
+enum controllertype_e INS_GetControllerType(int id)
+{
+	return CONTROLLER_NONE;
+}
+void INS_Rumble(int joy, quint16_t amp_low, quint16_t amp_high, quint32_t duration)
+{
+}
+void INS_RumbleTriggers(int joy, quint16_t left, quint16_t right, quint32_t duration)
+{
+}
+void INS_SetLEDColor(int id, vec3_t color)
+{
+}
+void INS_SetTriggerFX(int id, const void *data, size_t size)
+{
 }
