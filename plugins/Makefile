@@ -523,7 +523,13 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
-
+######################################
+#internal x11 server
+$(PLUG_PREFIX)xsv$(PLUG_NATIVE_EXT): xsv/m_x.c xsv/x_reqs.c xsv/x_res.c ../engine/qclib/hash.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,xsv,$@,X Server,Internal X11 Server.)
+NATIVE_PLUGINS+=xsv
+######################################
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
 ######################################

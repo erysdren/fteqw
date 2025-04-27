@@ -1059,7 +1059,8 @@ void XWindows_Startup(int x11display)	//initialise the server socket and do any 
 		X_InitRequests();
 		XS_CreateInitialResources();
 
-		system(va("DISPLAY=127.0.0.1:%i /usr/bin/x-terminal-emulator &", x11display));
+		//nono.
+		//system(va("DISPLAY=127.0.0.1:%i /usr/bin/x-terminal-emulator &", x11display));
 	}
 
 //	Menu_Control(MENU_GRAB);
@@ -1964,7 +1965,7 @@ void XWindows_KeyDown(int key)
 		else
 		{
 			ev.u.u.type						= KeyPress;
-			ev.u.u.detail					= QKeyToScan(key);
+			ev.u.u.detail					= QKeyToScan(key) - 7;
 			if (!ev.u.u.detail)
 				return;	//urm, never mind
 			ev.u.keyButtonPointer.state		= 0;
@@ -2063,7 +2064,7 @@ void XWindows_Keyup(int key)
 		else
 		{
 			ev.u.u.type					= KeyRelease;
-			ev.u.u.detail				= QKeyToScan(key);
+			ev.u.u.detail				= QKeyToScan(key) - 7;
 			if (!ev.u.u.detail)
 				return;	//urm, never mind
 			ev.u.keyButtonPointer.child		= x_windowwithfocus;
@@ -2124,39 +2125,33 @@ void XWindows_Keyup(int key)
 	return 0;
 }*/
 
-static int X11_ExecuteCommand(qboolean isinsecure)
+static void X11_startx_f(void)
 {
-	char cmd[256];
-	cmdfuncs->Argv(0, cmd, sizeof(cmd));
-	if (!strcmp("startx", cmd))
+	if (confuncs)
 	{
-		if (confuncs)
+		const char *console = "x11";
+		if (confuncs->GetConsoleFloat(console, "iswindow") != true)
 		{
-			const char *console = "x11";
-			if (confuncs->GetConsoleFloat(console, "iswindow") != true)
-			{
-				confuncs->SetConsoleString(console, "title", "X11");
-				confuncs->SetConsoleFloat(console, "iswindow", true);
-				confuncs->SetConsoleFloat(console, "forceutf8", true);
-				confuncs->SetConsoleFloat(console, "linebuffered", false);
-				confuncs->SetConsoleFloat(console, "maxlines", 0);
-				confuncs->SetConsoleFloat(console, "wnd_x", 0);
-				confuncs->SetConsoleFloat(console, "wnd_y", 0);
-				confuncs->SetConsoleFloat(console, "wnd_w", 640);
-				confuncs->SetConsoleFloat(console, "wnd_h", 480);
-				confuncs->SetConsoleString(console, "footer", "");
-			}
-			confuncs->SetConsoleString(console, "backvideomap", "x11");
-			confuncs->SetActive(console);
+			confuncs->SetConsoleString(console, "title", "X11");
+			confuncs->SetConsoleFloat(console, "iswindow", true);
+			confuncs->SetConsoleFloat(console, "forceutf8", true);
+			confuncs->SetConsoleFloat(console, "linebuffered", false);
+			confuncs->SetConsoleFloat(console, "maxlines", 0);
+			confuncs->SetConsoleFloat(console, "wnd_x", 0);
+			confuncs->SetConsoleFloat(console, "wnd_y", 0);
+			confuncs->SetConsoleFloat(console, "wnd_w", 640);
+			confuncs->SetConsoleFloat(console, "wnd_h", 480);
+			confuncs->SetConsoleString(console, "footer", "");
 		}
-		else
-		{
-			cmdfuncs->Argv(1, cmd, sizeof(cmd));
-			XWindows_Startup(*cmd?atoi(cmd):-1);
-		}
-		return 1;
+		confuncs->SetConsoleString(console, "backvideomap", "x11");
+		confuncs->SetActive(console);
 	}
-	return 0;
+	else
+	{
+		char cmd[256];
+		cmdfuncs->Argv(1, cmd, sizeof(cmd));
+		XWindows_Startup(*cmd?atoi(cmd):-1);
+	}
 }
 
 static void QDECL X11_Tick(double realtime, double gametime)
@@ -2258,7 +2253,6 @@ qboolean Plug_Init(void)
 	confuncs = plugfuncs->GetEngineInterface(plugsubconsolefuncs_name, sizeof(*confuncs));
 
 	if (!netfuncs ||
-		!plugfuncs->ExportFunction("ExecuteCommand", X11_ExecuteCommand) ||
 //		!plugfuncs->ExportFunction("MenuEvent", X11_MenuEvent) ||
 		!plugfuncs->ExportFunction("Tick", X11_Tick))
 	{
@@ -2274,7 +2268,7 @@ qboolean Plug_Init(void)
 
 	Con_Printf("XServer plugin started\n");
 
-	cmdfuncs->AddCommand("startx");
+	cmdfuncs->AddCommand("startx", X11_startx_f, "start X11 server");
 
 #ifndef K_CTRL
 	K_CTRL			= pKey_GetKeyCode("ctrl");
