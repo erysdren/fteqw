@@ -523,6 +523,12 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
-
+######################################
+#for compat with gta 2's file formats
+$(PLUG_PREFIX)gta2$(PLUG_NATIVE_EXT): gta2/gbh.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,gta2,$@,GTA2 Formats,Provides support for various formats used by Grand Theft Auto 2.)
+NATIVE_PLUGINS+=gta2
+######################################
 
 all: $(foreach FOO,$(NATIVE_PLUGINS), $(PLUG_PREFIX)$(FOO)$(PLUG_NATIVE_EXT))
