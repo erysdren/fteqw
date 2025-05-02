@@ -729,6 +729,7 @@ PROFILE_CFLAGS=-pg
 DX7SDK=-I./libs/dxsdk7/include/
 
 GLCFLAGS?=-DGLQUAKE
+SWCFLAGS?=-DSWQUAKE
 D3DCFLAGS?=-DD3D9QUAKE -DD3D11QUAKE
 VKCFLAGS?=-DVKQUAKE
 
@@ -803,6 +804,11 @@ GLQUAKE_OBJS =		\
 	gl_bloom.o		\
 	gl_vidcommon.o		\
 	$(VKQUAKE_OBJS)
+
+SOFTWARE_OBJS =		\
+	sw_rast.o 		\
+	sw_backend.o 		\
+	sw_image.o		\
 
 D3DQUAKE_OBJS =		\
 	d3d8_backend.o \
@@ -1158,8 +1164,8 @@ MB_DIR=m_$(FTE_FULLTARGET)
 MCL_DIR=mcl_$(FTE_FULLTARGET)
 M_EXE_NAME=../$(EXE_NAME)-$(FTE_FULLTARGET)
 MCL_EXE_NAME=../$(EXE_NAME)-cl$(FTE_FULLTARGET)
-MCL_OBJS=$(D3DGL_OBJS) $(GLQUAKE_OBJS) $(SOFTWARE_OBJS) gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o 
-M_CFLAGS=-DFTE_SDL $(VKCFLAGS) $(GLCFLAGS) -DMULTITHREAD `$(SDLCONFIG) --cflags`
+MCL_OBJS=$(D3DGL_OBJS) $(GLQUAKE_OBJS) $(SOFTWARE_OBJS) sw_vidsdl.o gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o
+M_CFLAGS=-DFTE_SDL $(SWCFLAGS) $(VKCFLAGS) $(GLCFLAGS) -DMULTITHREAD `$(SDLCONFIG) --cflags`
 
 QCC_DIR=qcc$(BITS)
 
@@ -1691,8 +1697,6 @@ ifeq ($(FTE_TARGET),dos)
 	VKCL_DIR=vkcl_dos
 
 	IMAGELDFLAGS=
-
-	SOFTWARE_OBJS=sw_rast.o sw_backend.o sw_image.o
 
 	M_LDFLAGS=
 	M_CFLAGS=-DSWQUAKE -DNO_ZLIB
