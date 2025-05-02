@@ -156,9 +156,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #endif
 
 //software rendering is just too glitchy, don't use it - unless its the only choice.
-#if defined(SWQUAKE) && !defined(_DEBUG) && !defined(__DJGPP__)
-	#undef SWQUAKE
-#endif
+//#if defined(SWQUAKE) && !defined(_DEBUG) && !defined(__DJGPP__)
+//	#undef SWQUAKE
+//#endif
 #if defined(USE_EGL) && !defined(GLQUAKE)
 	#undef USE_EGL
 #endif
