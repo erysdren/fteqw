@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with build's file formats
+$(PLUG_PREFIX)build$(PLUG_NATIVE_EXT): build/build.c build/fs_grp.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,build,$@,BUILD Formats,Provides support for various formats used by the BUILD engine.)
+NATIVE_PLUGINS+=build
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
