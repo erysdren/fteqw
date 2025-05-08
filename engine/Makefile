@@ -455,6 +455,22 @@ ifeq ($(FTE_TARGET),dos)
 	CFLAGS+=-DNO_ZLIB
 endif
 
+ifeq ($(FTE_TARGET),psp)
+	CC=psp-gcc
+	LD=psp-gcc
+	PKGCONFIG=psp-pkg-config
+	CXX=psp-g++
+	STRIP=psp-strip
+	BITS=32
+	LDFLAGS+=-Wl,-zmax-page-size=128
+	CFLAGS+=-D_PSP_FW_VERSION=600
+	CXXFLAGS+=-D_PSP_FW_VERSION=600
+	LINK_QUAKE3=0
+	USE_OPUS=0
+	USE_SPEEX=0
+	BASELDFLAGS=""
+endif
+
 #if you have an x86, you can get gcc to build binaries using 3 different ABIs, instead of builds for just the default ABI
 ifeq ($(FTE_TARGET),linux32)
 	FTE_TARGET=linux
@@ -1138,6 +1154,10 @@ endif
 ifeq ($(FTE_TARGET),SDL)
     FTE_FULLTARGET?=sdl$(BITS)
 endif
+ifeq ($(FTE_TARGET),psp)
+    SDLCONFIG?=$(PKGCONFIG) sdl2
+    FTE_FULLTARGET?=sdl2$(BITS)
+endif
 SDLCONFIG?=sdl-config
 FTE_FULLTARGET?=sdl$(FTE_TARGET)$(BITS)
 
@@ -1792,6 +1812,13 @@ ifeq ($(FTE_TARGET),morphos)
 	SV_OBJS=$(COMMON_OBJS) $(SERVER_OBJS) $(PROGS_OBJS) $(SERVERONLY_OBJS)
 	SV_EXE_NAME=../$(EXE_NAME)-morphos-sv$(BITS)
 	SV_CFLAGS=$(SERVER_ONLY_CFLAGS)	
+endif
+
+ifeq ($(FTE_TARGET),psp)
+	EXEPOSTFIX=.elf
+	PSPSDK?=$(shell psp-config --pspsdk-path)
+	GL_LDFLAGS+=-L$(PSPDEV)/psp/lib -L$(PSPSDK)/lib
+	GL_EXE_NAME=../$(EXE_NAME)-psp-gl$(EXEPOSTFIX)
 endif
 
 ifeq ($(FTE_TARGET),dos)

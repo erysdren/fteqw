@@ -265,6 +265,31 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#undef FTPCLIENT		//ftp client.
 #endif
 
+#ifdef __PSP__
+	#undef WEBCLIENT
+	#undef HAVE_HTTPSV
+	#undef TCPCONNECT
+	#undef FTPSERVER
+	#undef HAVE_TCP
+	#undef HAVE_GNUTLS
+	#undef HAVE_DTLS
+	#undef HAVE_PACKET
+	#undef HAVE_WINSSPI
+	#undef SUPPORT_ICE
+	#undef SUBSERVERS
+	#undef PLUGINS
+	#undef Q2SERVER
+	#undef Q3SERVER
+	#undef Q2CLIENT
+	#undef Q3CLIENT
+	#undef MULTITHREAD
+	#undef VOICECHAT
+	#undef AVAIL_JPEGLIB
+	#undef AVAIL_PNGLIB
+	#undef AVAIL_OGGVORBIS
+	#undef AVAIL_OPENAL
+#endif
+
 #ifdef __DJGPP__
 	//no bsd sockets library.
 	#undef HAVE_TCP

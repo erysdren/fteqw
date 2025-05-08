@@ -1,6 +1,10 @@
 #ifndef MERGED_H
 #define MERGED_H
 
+#ifdef __PSP__
+#undef mips
+#endif
+
 #ifdef VKQUAKE
 //we need some types available elsewhere, but don't really want to have to include the entire vulkan api everywhere.
 //unfortunately, vulkan's handle types are not well defined.

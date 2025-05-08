@@ -118,6 +118,7 @@
 #else
 	#include <sys/time.h>
 	#include <sys/types.h>
+#ifndef __PSP__
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
@@ -125,6 +126,7 @@
 	#include <sys/ioctl.h>
 	#include <sys/uio.h>
 	#include <arpa/inet.h>
+#endif
 	#include <errno.h>
 
 	#include <unistd.h>
