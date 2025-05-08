@@ -306,7 +306,9 @@ IF(CMAKE_C_COMPILER_ID MATCHES "GNU")
 #	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wswitch-enum")					#to warn about omitted enums despite default.
 
 	#might as well do this, public builds use the regular Makefile.
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+	if(NOT PSP)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=native")
+	endif()
 	IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall ${FTE_WERROR_} -Wno-pointer-sign -Wno-unknown-pragmas -Wno-format-zero-length -Wno-strict-aliasing -Wno-error=cpp")
 	ELSE()
@@ -543,15 +545,17 @@ ELSEIF(1)	#SDL
 #	INCLUDE_DIRECTORIES(engine/libs engine/libs/freetype2/include)
 
 	FIND_PACKAGE(PkgConfig REQUIRED)
-	PKG_SEARCH_MODULE(sdl2 REQUIRED sdl2)
+	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
 
-	FIND_PACKAGE(SDL2 REQUIRED)
+	if (NOT SDL2_FOUND)
+		FIND_PACKAGE(SDL2 REQUIRED)
+	endif()
 
 	INCLUDE_DIRECTORIES(${FREETYPE_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
 	
 	#SDL2.0.7 supports vulkan, so lets use it.
 	SET(FTE_DEFINES ${FTE_DEFINES};FTE_SDL;MULTITHREAD)
-	SET(FTE_LIBS ${FTE_LIBS} ${SYS_LIBS} ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
+	SET(FTE_LIBS ${FTE_LIBS} ${SYS_LIBS} $<IF:$<BOOL:${PSP}>,,${CMAKE_DL_LIBS}> ${SDL2_LIBRARIES})
 	SET(FTE_ARCH_FILES
 		engine/client/sys_sdl.c
 		engine/client/snd_al.c
@@ -562,7 +566,7 @@ ELSEIF(1)	#SDL
 	)
 
 	SET(FTESV_DEFINES ${FTESV_DEFINES};MULTITHREAD)
-	SET(FTESV_LIBS ${FTESV_LIBS} ${SYS_LIBS} ${CMAKE_DL_LIBS} ${SDL2_LIBRARIES})
+	SET(FTESV_LIBS ${FTESV_LIBS} ${SYS_LIBS} $<IF:$<BOOL:${PSP}>,,${CMAKE_DL_LIBS}> ${SDL2_LIBRARIES})
 
 	IF(WIN32)
 		SET(FTE_LIBS ${FTE_LIBS} wsock32 gdi32 ole32)
@@ -1111,6 +1115,16 @@ ELSE()
 			SOURCES
 				${FTE_ARCH_FILES} ${FTE_COMMON_FILES} ${FTE_CLIENT_FILES} ${FTE_SERVER_FILES}
 		)
+
+		if(PSP)
+			create_pbp_file(
+				TARGET fteqw
+				ICON_PATH NULL
+				BACKGROUND_PATH NULL
+				PREVIEW_PATH NULL
+				TITLE "fteqw"
+			)
+		endif()
 	ENDIF()
 
 	SET(FTE_ENGINE_SERVER_ONLY true CACHE BOOL "Compile fteqw-sv (server only) engine binary.")

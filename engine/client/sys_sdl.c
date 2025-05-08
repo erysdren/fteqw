@@ -400,6 +400,7 @@ void Sys_mkdir (const char *path)
 
 qboolean Sys_rmdir (const char *path)
 {
+#ifndef __PSP__
 	int ret;
 #if WIN32
 	ret = _rmdir (path);
@@ -410,6 +411,7 @@ qboolean Sys_rmdir (const char *path)
 		return true;
 //	if (errno == ENOENT)
 //		return true;
+#endif
 	return false;
 }
 
@@ -790,7 +792,7 @@ int Sys_EnumerateFiles (const char *gpath, const char *match, int (*func)(const 
 }
 
 #else
-int Sys_EnumerateFiles (const char *gpath, const char *match, int (*func)(const char *, qofs_t, time_t mtime, void *, void *), void *parm, void *spath)
+int Sys_EnumerateFiles (const char *gpath, const char *match, int (*func)(const char *, qofs_t, time_t mtime, void *, searchpathfuncs_t *), void *parm, searchpathfuncs_t *spath)
 {
 	Con_Printf("Warning: Sys_EnumerateFiles not implemented\n");
 	return false;
@@ -1090,7 +1092,7 @@ int QDECL main(int argc, char **argv)
 	parms.manifest = CONFIG_MANIFEST_TEXT;
 #endif
 
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__PSP__)
 	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | O_NDELAY);
 #endif
 

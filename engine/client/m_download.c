@@ -865,7 +865,11 @@ static package_t *PM_InsertPackage(package_t *p)
 			}
 			else
 			{
-				if (((p->flags & DPF_GUESSED) && (prev->flags & (DPF_USERMARKED|DPF_MANIMARKED|DPF_PENDING))) || prev->curdownload)
+				if (((p->flags & DPF_GUESSED) && (prev->flags & (DPF_USERMARKED|DPF_MANIMARKED|DPF_PENDING)))
+#ifdef WEBCLIENT
+				 || prev->curdownload
+#endif
+				)
 				{	//the new one was also guessed. just return the existing package instead.
 					prev->flags |= p->flags&(DPF_PRESENT|DPF_ALLMARKED|DPF_ENABLED);
 					PM_FreePackage(p);
@@ -1058,8 +1062,10 @@ static void PM_AddSubListModule(void *module, plugupdatesourcefuncs_t *funcs, co
 		pm_sequence++;
 	}
 
+#ifdef WEBCLIENT
 	if (pm_source[i].funcs && (pm_source[i].status == SRCSTAT_UNTRIED) && (pm_source[i].flags&SRCFL_ENABLED))	//cache only!
 		pm_source[i].funcs->Update(pm_source[i].url, VFS_OpenPipeCallback(PM_Plugin_Source_CacheFinished, &pm_source[i]), true);
+#endif
 }
 static void PM_AddSubList(const char *url, const char *prefix, unsigned int flags)
 {
@@ -1923,13 +1929,17 @@ void *PM_GeneratePackageFromMeta(vfsfile_t *file, char *fname, size_t fnamesize,
 			pkgdata = NULL;
 			Menu_PromptOrPrint(va(localtext("Refusing to install to requested location\n%s\n"), fname), "Cancel", true);
 		}
-		else*/ if (!PM_SignatureOkay(p))
+		else*/
+#ifdef WEBCLIENT
+		if (!PM_SignatureOkay(p))
 		{	//only allow if its trustworthy (or paks/pk3s)
 			Z_Free(pkgdata);
 			pkgdata = NULL;
 			Menu_PromptOrPrint(va(localtext("Bad MetaData Signature\n%s\n"), fname), "Cancel", true);
 		}
-		else if (p->extract == EXTRACT_COPY)
+		else
+#endif
+		if (p->extract == EXTRACT_COPY)
 		{
 			vfsfile_t *vfs;
 			const char *f = PM_GetDepSingle(p, DEP_FILE);
@@ -2792,9 +2802,9 @@ unsigned int PM_MarkUpdates (void)
 	package_t *e = NULL;
 	int bestengine = parse_revision_number(enginerevision, true);
 	int them;
-#endif
 
 	doautoupdate = 0;
+#endif
 
 	if (fs_manifest && fs_manifest->installupd)
 	{
@@ -4516,11 +4526,11 @@ unsigned int PM_IsApplying(void)
 	for (i = 0; i < pm_numsources; i++)
 		if (pm_source[i].curdl)
 			ret |= 1;	//some source is downloading.
-#endif
 	if (pm_pendingprompts)
 		ret |= 2;	//waiting for user action to complete.
 	if (doautoupdate)
 		ret |= 4;	//will want to trigger a prompt...
+#endif
 
 	return ret;
 }
@@ -4990,6 +5000,7 @@ static void PM_Pkg_ListPackage(package_t *p, const char **category)
 	else
 		Con_Printf(" ^&0EUnsigned");
 
+#ifdef WEBCLIENT
 	if (p->curdownload)
 	{
 		if (p->curdownload->totalsize==0)
@@ -5001,6 +5012,7 @@ static void PM_Pkg_ListPackage(package_t *p, const char **category)
 		Con_Printf(" Finalising...");
 	else if (p->trymirrors)
 		Con_Printf(" Pending...");
+#endif
 
 	Con_Printf("\n");
 }
