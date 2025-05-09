@@ -1585,6 +1585,7 @@ IF(FTE_PLUG_HL2)
 		plugins/hl2/img_tth.c
 		plugins/hl2/img_vtf.c
 		plugins/hl2/mod_hl2.c
+		plugins/hl2/mod_vtmb.c
 		plugins/hl2/mod_vbsp.c
 		plugins/hl2/mat_vmt.c
 	)
