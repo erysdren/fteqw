@@ -6,6 +6,7 @@ qboolean VTF_Init(void);
 qboolean MDL_Init(void);
 qboolean VMT_Init(void);
 qboolean VBSP_Init(void);
+qboolean VTMB_MDL_Init(void);
 
 qboolean Plug_Init(void)
 {
@@ -21,6 +22,7 @@ qboolean Plug_Init(void)
 	if (!VMT_Init())	Con_Printf(CON_ERROR"%s: VMT support unavailable\n", plugname);	else	somethingisokay = true;
 	if (!MDL_Init())	Con_Printf(CON_ERROR"%s: MDL support unavailable\n", plugname);	else	somethingisokay = true;
 	if (!VBSP_Init())	Con_Printf(CON_ERROR"%s: BSP support unavailable\n", plugname);	else	somethingisokay = true;
+	if (!VTMB_MDL_Init())	Con_Printf(CON_ERROR"%s: VTMB MDL support unavailable\n", plugname);	else	somethingisokay = true;
 	return somethingisokay;
 }
 
