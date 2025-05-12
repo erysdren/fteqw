@@ -523,7 +523,13 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
-
+######################################
+#terrain generator
+$(PLUG_PREFIX)terraingen$(PLUG_NATIVE_EXT): terrorgen/terragen.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,terraingen,$@,TerrainGen,Provides an automatic terrain generator.)
+NATIVE_PLUGINS+=terraingen
+######################################
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
 ######################################
