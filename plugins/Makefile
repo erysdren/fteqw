@@ -106,7 +106,7 @@ PLUG_NATIVE_EXT?=.so
 PLUG_DEFFILE?=
 PLUG_CFLAGS?=-fPIC -Wl,--no-undefined -Bsymbolic -fvisibility=hidden -static-libgcc
 PLUG_CXXFLAGS?=-fPIC -Wl,--no-undefined -Bsymbolic -fvisibility=hidden -static-libgcc
-PLUG_CMAKE?=-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX)
+PLUG_CMAKE?=-DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_COMPILER="$(firstword $(CC))" -DCMAKE_C_FLAGS="$(wordlist 2,99,$(CC))" -DCMAKE_CXX_COMPILER="$(firstword $(CXX))" -DCMAKE_CXX_FLAGS="$(wordlist 2,99,$(CXX))"
 PLUG_LDFLAGS_ZLIB?=
 ARCH:=$(shell $(CC) -dumpmachine)
 PLUG_LDFLAGS:=-L$(ARCHLIBS) $(PLUG_LDFLAGS)
@@ -311,6 +311,27 @@ $(PLUG_PREFIX)bullet$(PLUG_NATIVE_EXT): bullet/bulletplug.cpp plugin.c $(BULLET_
 	$(CXX) $(BASE_CXXFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS) $(BULLET_CFLAGS)
 	$(call EMBEDMETA,bullet,$@,Bullet Physics Plugin,Provides Rigid Body Physics.)
 #NATIVE_PLUGINS+=bullet
+######################################
+
+######################################
+#jolt physics
+JOLT_VER=5.3.0
+JOLT_URL=https://github.com/jrouwe/JoltPhysics/archive/refs/tags/v$(JOLT_VER).tar.gz
+JOLT_BASE=$(ARCHLIBS)/
+$(OUT_DIR)/../JoltPhysics-$(JOLT_VER).tar.gz:
+	mkdir -p $(JOLT_BASE)
+	wget -N $(JOLT_URL) -O $@
+
+JOLT_LIB=$(JOLT_BASE)JoltPhysics-$(JOLT_VER)/Build/Build/libJolt.a
+JOLT_CFLAGS+=-I$(JOLT_BASE)JoltPhysics-$(JOLT_VER)/
+$(JOLT_LIB): $(OUT_DIR)/../JoltPhysics-$(JOLT_VER).tar.gz $(CMAKERULES)
+	mkdir -p $(JOLT_BASE) && cd $(JOLT_BASE) && tar xvfz $<
+	cd $(JOLT_BASE)JoltPhysics-$(JOLT_VER)/Build/ && mkdir -p Build && cmake $(PLUG_CMAKE) -S. -BBuild && $(MAKE) -CBuild Jolt
+
+$(PLUG_PREFIX)jolt$(PLUG_NATIVE_EXT): jolt/jolt.cpp plugin.c $(JOLT_LIB)
+	$(CXX) $(BASE_CXXFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS) $(JOLT_CFLAGS)
+	$(call EMBEDMETA,jolt,$@,Jolt Physics Plugin,Provides Rigid Body Physics.)
+NATIVE_PLUGINS+=jolt
 ######################################
 
 ######################################
