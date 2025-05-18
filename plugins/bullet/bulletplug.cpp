@@ -1671,7 +1671,9 @@ static void QDECL World_Bullet_TraceEntity(world_t *world, wedict_t *ed, vec3_t 
 	class myConvexResultCallback : public btCollisionWorld::ConvexResultCallback
 	{
 	public:
-		void *m_impactent;
+		world_t *m_world;
+		wedict_t *m_passedent;
+		wedict_t *m_impactent;
 		btVector3 m_impactpos;
 		btVector3 m_impactnorm;
 		virtual	btScalar	addSingleResult(btCollisionWorld::LocalConvexResult& convexResult,bool normalInWorldSpace)
@@ -1681,11 +1683,28 @@ static void QDECL World_Bullet_TraceEntity(world_t *world, wedict_t *ed, vec3_t 
 				m_closestHitFraction = convexResult.m_hitFraction;
 				m_impactpos = convexResult.m_hitPointLocal;
 				m_impactnorm = convexResult.m_hitNormalLocal;
-				m_impactent = convexResult.m_hitCollisionObject->getUserPointer();
+				m_impactent = (wedict_t *)convexResult.m_hitCollisionObject->getUserPointer();
 			}
 			return 0;
 		}
+		virtual bool needsCollision(btBroadphaseProxy *proxy0) const
+		{
+			wedict_t *touch = (wedict_t *)((btCollisionObject *)proxy0->m_clientObject)->getUserPointer();
+			if (m_passedent == touch)
+				return false;	// don't clip against self
+			if (!((int)m_passedent->xv->dimension_hit & (int)touch->xv->dimension_solid))
+				return false;	// respect dimension value
+			// from World_ClipToLinks erysdren 2025-05-19
+			if ((wedict_t *)PROG_TO_EDICT(m_world->progs, touch->v->owner) == m_passedent)
+				return false;	// don't clip against own missiles
+			if ((wedict_t *)PROG_TO_EDICT(m_world->progs, m_passedent->v->owner) == touch)
+				return false;	// don't clip against owner
+			// end World_ClipToLinks
+			return touch->v->movetype == MOVETYPE_PHYSICS;
+		}
 	} result;
+	result.m_world = world;
+	result.m_passedent = ed;
 	result.m_impactent = nullptr;
 	result.m_closestHitFraction = trace->fraction;
 
