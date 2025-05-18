@@ -270,7 +270,7 @@ $(PLUG_PREFIX)ode$(PLUG_NATIVE_EXT): $(ODE_FILES)
 ######################################
 ifneq ($(CMAKERULES),)
 BULLET_CFLAGS+=-static-libstdc++
-PLUG_CMAKE+= -DCMAKE_TOOLCHAIN_FILE="$(CMAKERULES)" 
+PLUG_CMAKE+= -DCMAKE_TOOLCHAIN_FILE="$(CMAKERULES)"
 $(CMAKERULES):
 	echo "set(CMAKE_SYSTEM_NAME Windows)" > $@
 	echo "set(TOOLCHAIN_PREFIX `$(CC) -dumpmachine`)" >> $@
@@ -286,7 +286,7 @@ $(CMAKERULES):
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 endif
 
-BULLET_VER=2.87
+BULLET_VER=3.17
 BULLET_URL=https://github.com/bulletphysics/bullet3/archive/$(BULLET_VER).tar.gz
 BULLET_BASE=$(OUT_DIR)/../bullet3-$(BULLET_VER)_$(FTE_TARGET)/
 BULLET_LIBS=	\
@@ -310,7 +310,7 @@ $(BULLET_LIB): $(OUT_DIR)/../bullet3-$(BULLET_VER).tar.gz $(CMAKERULES)
 $(PLUG_PREFIX)bullet$(PLUG_NATIVE_EXT): bullet/bulletplug.cpp plugin.c $(BULLET_LIBS)
 	$(CXX) $(BASE_CXXFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS) $(BULLET_CFLAGS)
 	$(call EMBEDMETA,bullet,$@,Bullet Physics Plugin,Provides Rigid Body Physics.)
-#NATIVE_PLUGINS+=bullet
+NATIVE_PLUGINS+=bullet
 ######################################
 
 ######################################
