@@ -2681,10 +2681,10 @@ trace_t World_Move (world_t *w, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t e
 				}
 			}
 		}
-		/*else if (w->rbe_hasphysicsents && passedict->rbe.body.body)
+		else if (w->rbe_hasphysicsents && passedict->rbe.body.body && w->rbe->Trace)
 		{
 			w->rbe->Trace(w, clip.passedict, clip.start, clip.end, &clip.trace);
-		}*/
+		}
 		else
 		{
 #ifdef USEAREAGRID
