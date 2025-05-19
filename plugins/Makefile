@@ -245,13 +245,9 @@ NATIVE_PLUGINS+=ffmpeg
 #small script for ode
 #FIXME: ode fails to compile under cygwin
 #FIXME: race condition if you try compiling debug+release at the same time, as this makefile is invoked twice by the engine's one
-ODE_ARCH=$(FTE_TARGET)
-ifeq ($(ODE_ARCH),)
-  ODE_ARCH=unknown
-endif
-ODE_VER=0.16.5
+ODE_VER=0.16.6
 ODE_URL=https://bitbucket.org/odedevs/ode/downloads/ode-$(ODE_VER).tar.gz
-ODE_BASE=$(ARCHLIBS)/ode-$(ODE_VER)_$(ODE_ARCH)/
+ODE_BASE=$(ARCHLIBS)/
 ODE_LIB=$(ODE_BASE)ode-$(ODE_VER)/ode/src/.libs/libode.a
 $(OUT_DIR)/../ode-$(ODE_VER).tar.gz:
 	mkdir -p $(ODE_BASE)
@@ -264,7 +260,7 @@ ODE_FILES=../engine/common/com_phys_ode.c ../engine/common/mathlib.c plugin.c $(
 $(PLUG_PREFIX)ode$(PLUG_NATIVE_EXT): $(ODE_FILES)
 	$(CC) -flto -s $(BASE_CFLAGS) $(CFLAGS) -Os -DFTEPLUGIN -DODE_STATIC -o $@ -shared $(PLUG_CFLAGS) -I$(ODE_BASE)ode-$(ODE_VER)/include $(ODE_FILES) $(PLUG_DEFFILE) $(PLUG_LDFLAGS) -static-libgcc `$(CC) -print-file-name=libstdc++.a` -lpthread
 	$(call EMBEDMETA,ode,$@,ODE Physics,Provides Rigid Body Physics behaviours.)
-#NATIVE_PLUGINS+=ode
+NATIVE_PLUGINS+=ode
 ######################################
 
 ######################################

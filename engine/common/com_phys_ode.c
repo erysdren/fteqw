@@ -1596,10 +1596,10 @@ static void World_ODE_Frame_JointFromEntity(world_t *world, wedict_t *ed)
 			jgid = dJointGroupCreate(0);
 			ragGroups = jointgroup;
 		} else {
-			jgid = (dJointGroupID)jointgroup;
+			jgid = (dJointGroupID)jointgroup; // FIXME: cast from pointer to integer of different size
 		}
 
-		ed->rbe.jointgroup = (int)jgid;
+		ed->rbe.jointgroup = (int)jgid; // FIXME: cast from pointer to integer of different size
 	}
 
 	AngleVectorsFLU(angles, forward, left, up);
@@ -2822,6 +2822,67 @@ static void QDECL World_ODE_PushCommand(world_t *world, rbecommandqueue_t *val)
 		ctx->cmdqueuetail = ctx->cmdqueuehead = cmd;
 }
 
+struct odetrace_s {
+	world_t *world;
+	wedict_t *edict;
+	trace_t *trace;
+	qboolean claimed;
+};
+
+static void VARGS traceNearCallback (void *data, dGeomID o1, dGeomID o2)
+{
+	dContact contact[MAX_CONTACTS]; // max contacts per collision pair
+	int numcontacts;
+	struct odetrace_s *tracectx = (struct odetrace_s *)data;
+	wedict_t *ed1, *ed2;
+
+	if (tracectx->claimed)
+		return;
+
+	// generate contact points between the two non-space geoms
+	numcontacts = dCollide(o1, o2, MAX_CONTACTS, &(contact[0].geom), sizeof(contact[0]));
+	if (numcontacts)
+	{
+		ed1 = (wedict_t *) dGeomGetData(contact[0].geom.g1);
+		ed2 = (wedict_t *) dGeomGetData(contact[0].geom.g2);
+		memset ( tracectx->trace, 0, sizeof ( trace_t ) );
+		tracectx->trace->endpos[0] = contact[0].geom.pos[0];
+		tracectx->trace->endpos[1] = contact[0].geom.pos[1];
+		tracectx->trace->endpos[2] = contact[0].geom.pos[2];
+		tracectx->trace->plane.normal[0] = contact[0].geom.normal[0];
+		tracectx->trace->plane.normal[1] = contact[0].geom.normal[1];
+		tracectx->trace->plane.normal[2] = contact[0].geom.normal[2];
+		tracectx->trace->fraction = tracectx->trace->truefraction = contact[0].geom.depth;
+
+		if (ed1 != tracectx->edict)
+			tracectx->trace->ent = ed1;
+		else if (ed2 != tracectx->edict)
+			tracectx->trace->ent = ed2;
+		else
+			return; // ???
+
+		tracectx->claimed = true;
+	}
+}
+
+static void QDECL World_ODE_TraceEntity(world_t *world, wedict_t *ed, vec3_t start, vec3_t end, trace_t *trace)
+{
+	struct odectx_s *ctx = (struct odectx_s*)world->rbe;
+	struct odetrace_s tracectx;
+
+	Con_Printf("meow\n");
+
+	if (!ed->rbe.body.geom)
+		return;
+
+	tracectx.world = world;
+	tracectx.edict = ed;
+	tracectx.trace = trace;
+	tracectx.claimed = false;
+
+	dSpaceCollide2(ctx->space, (dGeomID)ed->rbe.body.geom, (void *)&tracectx, &traceNearCallback);
+}
+
 static void QDECL World_ODE_Start(world_t *world)
 {
 	struct odectx_s *ctx;
@@ -2862,6 +2923,7 @@ static void QDECL World_ODE_Start(world_t *world)
 	ctx->pub.RagDestroyJoint		= World_ODE_RagDestroyJoint;
 	ctx->pub.RunFrame				= World_ODE_Frame;
 	ctx->pub.PushCommand			= World_ODE_PushCommand;
+	ctx->pub.Trace					= World_ODE_TraceEntity;
 
 	if(physics_ode_world_erp->value >= 0)
 		dWorldSetERP(ctx->dworld, physics_ode_world_erp->value);
