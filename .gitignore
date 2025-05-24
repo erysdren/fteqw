@@ -13,6 +13,9 @@ engine/shaders/vulkanblobs/
 plugins/cef/cef_linux64/
 plugins/cef/cef_windows64/
 
+#cmake builds
+build/
+
 #quakec build artifacts...
 quakec/csaddon/csaddon.dat
 quakec/csaddon/csaddon.lno
