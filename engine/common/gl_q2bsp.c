@@ -4644,8 +4644,8 @@ static void CM_BuildBIH(model_t *mod, int submodel)
 	if (!q3bsp_bihtraces.ival)
 		return;	//skip this. fall back on other stuff.
 
-	if (mod->fromgame != fg_quake3)
-		return;
+	//if (mod->fromgame != fg_quake3)
+	//	return;
 
 	bihleafs = sub->num_brushes;
 	for (i = 0; i < sub->num_patches; i++)

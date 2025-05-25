@@ -55,6 +55,7 @@ movement and rotation of rigidbody entities
 
 #include "pr_common.h"
 #include "com_mesh.h"
+#include "com_bih.h"
 
 #include "Jolt/Jolt.h"
 #include "Jolt/RegisterTypes.h"
@@ -72,6 +73,7 @@ movement and rotation of rigidbody entities
 #include "Jolt/Physics/Collision/Shape/CylinderShape.h"
 #include "Jolt/Physics/Collision/Shape/CapsuleShape.h"
 #include "Jolt/Physics/Collision/Shape/MeshShape.h"
+#include "Jolt/Physics/Collision/Shape/ConvexHullShape.h"
 #include "Jolt/Physics/Body/BodyCreationSettings.h"
 #include "Jolt/Physics/Body/BodyActivationListener.h"
 #include "Jolt/Physics/Constraints/PointConstraint.h"
@@ -88,6 +90,30 @@ int VectorCompare(const vec3_t v1, const vec3_t v2)
 		if (v1[i] != v2[i])
 			return 0;
 	return 1;
+}
+vec_t Length(const vec3_t v)
+{
+	int		i;
+	float	length;
+
+	length = 0;
+	for (i=0 ; i< 3 ; i++)
+		length += v[i]*v[i];
+	length = sqrt (length);		// FIXME
+
+	return length;
+}
+float RadiusFromBounds(const vec3_t mins, const vec3_t maxs)
+{
+	int		i;
+	vec3_t	corner;
+
+	for (i=0 ; i<3 ; i++)
+	{
+		corner[i] = fabs(mins[i]) > fabs(maxs[i]) ? fabs(mins[i]) : fabs(maxs[i]);
+	}
+
+	return Length (corner);
 }
 #endif
 
@@ -288,11 +314,17 @@ static void World_Jolt_RunCommand(world_t *world, rbecommandqueue_t *cmd)
 	}
 }
 
+static void QDECL EnumerateBrushes_Callback(model_t *model, q2cbrush_t *brush, void *user)
+{
+	Con_Printf("brush!\n");
+}
+
 static void World_Jolt_BodyFromEntity(world_t *world, wedict_t *ed)
 {
 	JPH::Body *body = nullptr;
 	JPH::Shape *geom = nullptr;
 	JPH::MeshShapeSettings mesh_shape_settings;
+	JPH::ConvexHullShapeSettings convex_hull_shape_settings;
 	JPH::ShapeSettings *shape_settings = nullptr;
 	vec3_t maxs;
 	vec3_t mins;
@@ -451,46 +483,81 @@ static void World_Jolt_BodyFromEntity(world_t *world, wedict_t *ed)
 					return;
 				}
 
-				if (model->type == mod_brush)
-					VectorCopy(ed->v->origin, center);
-
-				if (!rbefuncs->GenerateCollisionMesh(world, model, ed, center))
+				if (model->funcs.EnumerateBrushes)
+					numbrushes = model->funcs.EnumerateBrushes(model, EnumerateBrushes_Callback, nullptr);
+				// Con_Printf("numbrushes: %d\n", numbrushes);
+				if (numbrushes > 0)
 				{
-					Con_Printf("Jolt: entity %i (classname %s) failed to generate collision mesh\n", NUM_FOR_EDICT(world->progs, (edict_t *)ed), PR_GetString(world->progs, ed->v->classname));
-					World_Jolt_RemoveFromEntity(world, ed);
-					return;
+					// if we have brushes, make some convex hulls out of them
 				}
-
-				// read in vertices
-				JPH::VertexList vertices;
-				for (int i = 0; i < ed->rbe.numvertices; i++)
+				else
 				{
-					vertices.push_back(JPH::Float3(ed->rbe.vertex3f[i * 3 + 0] * InchesToMeters, ed->rbe.vertex3f[i * 3 + 1] * InchesToMeters, ed->rbe.vertex3f[i * 3 + 2] * InchesToMeters));
-					// Con_Printf("%f %f %f\n", ed->rbe.vertex3f[i * 3 + 0], ed->rbe.vertex3f[i * 3 + 1], ed->rbe.vertex3f[i * 3 + 2]);
-				}
+					// makes things simpler
+					if (NUM_FOR_EDICT(world->progs, ed) == 0 || (model->type == mod_brush && DotProduct(ed->v->origin, ed->v->origin) == 0))
+						VectorCopy(ed->v->origin, center);
 
-				// read in triangles
-				JPH::IndexedTriangleList triangles;
-				for (int i = 0; i < ed->rbe.numtriangles; i++)
-				{
-					triangles.push_back(JPH::IndexedTriangle(ed->rbe.element3i[i * 3 + 0], ed->rbe.element3i[i * 3 + 1], ed->rbe.element3i[i * 3 + 2], 0));
-					// Con_Printf("%d %d %d\n", ed->rbe.element3i[i * 3 + 0], ed->rbe.element3i[i * 3 + 1], ed->rbe.element3i[i * 3 + 2]);
-				}
+					if (!rbefuncs->GenerateCollisionMesh(world, model, ed, center))
+					{
+						Con_Printf("Jolt: entity %i (classname %s) failed to generate collision mesh\n", NUM_FOR_EDICT(world->progs, (edict_t *)ed), PR_GetString(world->progs, ed->v->classname));
+						World_Jolt_RemoveFromEntity(world, ed);
+						return;
+					}
 
-				// create mesh
-				JPH::ShapeSettings::ShapeResult result;
-				mesh_shape_settings.mTriangleVertices = vertices;
-				mesh_shape_settings.mIndexedTriangles = triangles;
-				geom = new JPH::MeshShape(mesh_shape_settings, result);
-				if (result.HasError())
-				{
-					Con_Printf("Jolt: %s\n", result.GetError().c_str());
-					World_Jolt_RemoveFromEntity(world, ed);
-					return;
+					// we can only make a MeshShape out of worldspawn
+					if (NUM_FOR_EDICT(world->progs, ed) == 0)
+					{
+						// read in vertices
+						JPH::VertexList vertices;
+						for (int i = 0; i < ed->rbe.numvertices; i++)
+							vertices.push_back(JPH::Float3(ed->rbe.vertex3f[i * 3 + 0] * InchesToMeters, ed->rbe.vertex3f[i * 3 + 1] * InchesToMeters, ed->rbe.vertex3f[i * 3 + 2] * InchesToMeters));
+
+						// read in triangles
+						JPH::IndexedTriangleList triangles;
+						for (int i = 0; i < ed->rbe.numtriangles; i++)
+							triangles.push_back(JPH::IndexedTriangle(ed->rbe.element3i[i * 3 + 0], ed->rbe.element3i[i * 3 + 1], ed->rbe.element3i[i * 3 + 2], 0));
+
+						// create mesh
+						JPH::ShapeSettings::ShapeResult result;
+						mesh_shape_settings.mTriangleVertices = vertices;
+						mesh_shape_settings.mIndexedTriangles = triangles;
+						mesh_shape_settings.Sanitize();
+						geom = new JPH::MeshShape(mesh_shape_settings, result);
+						if (result.HasError())
+						{
+							Con_Printf("Jolt: %s\n", result.GetError().c_str());
+							World_Jolt_RemoveFromEntity(world, ed);
+							return;
+						}
+						mesh_shape_settings.SetEmbedded();
+						shape_settings = (JPH::ShapeSettings *)&mesh_shape_settings;
+					}
+					else
+					{
+						// otherwise, make a ConvexHullShape
+
+						// read in vertices
+						for (int i = 0; i < ed->rbe.numvertices; i++)
+							convex_hull_shape_settings.mPoints.push_back(JPH::Vec3(ed->rbe.vertex3f[i * 3 + 0], ed->rbe.vertex3f[i * 3 + 1], ed->rbe.vertex3f[i * 3 + 2]) * InchesToMeters);
+
+						// set radius
+						if (model->radius)
+							convex_hull_shape_settings.mMaxConvexRadius = model->radius * InchesToMeters;
+						else
+							convex_hull_shape_settings.mMaxConvexRadius = RadiusFromBounds(model->mins, model->maxs) * InchesToMeters;
+
+						// create shape
+						JPH::ShapeSettings::ShapeResult result;
+						geom = new JPH::ConvexHullShape(convex_hull_shape_settings, result);
+						if (result.HasError())
+						{
+							Con_Printf("Jolt: %s\n", result.GetError().c_str());
+							World_Jolt_RemoveFromEntity(world, ed);
+							return;
+						}
+						convex_hull_shape_settings.SetEmbedded();
+						shape_settings = (JPH::ShapeSettings *)&convex_hull_shape_settings;
+					}
 				}
-				mesh_shape_settings.SetEmbedded();
-				shape_settings = (JPH::ShapeSettings *)&mesh_shape_settings;
-				// Con_Printf("classname: %s type: %s\n", PR_GetString(world->progs, ed->v->classname), JPH::sSubShapeTypeNames[(int)geom->GetType()]);
 				break;
 			}
 
@@ -1050,8 +1117,8 @@ static void World_Jolt_JointFromEntity(world_t *world, wedict_t *ed)
 			settings.mPoint1 = (origin - enemyorigin) * InchesToMeters;
 			settings.mPoint2 = (origin - aimentorigin) * InchesToMeters;
 			settings.mSpace = JPH::EConstraintSpace::LocalToBodyCOM;
-			settings.mHingeAxis1 = JPH::Vec3(forward[0], forward[1], forward[2]);
-			settings.mNormalAxis1 = settings.mHingeAxis1.GetNormalizedPerpendicular();
+			settings.mHingeAxis1 = settings.mHingeAxis2 = JPH::Vec3(forward[0], forward[1], forward[2]);
+			settings.mNormalAxis1 = settings.mNormalAxis2 = settings.mHingeAxis1.GetNormalizedPerpendicular();
 
 			joint = new JPH::HingeConstraint(*enemybody, *aimentbody, settings);
 			break;
