@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with source 2's file formats
+$(PLUG_PREFIX)source2$(PLUG_NATIVE_EXT): source2/plugin.c source2/mod_vmap.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,source2,$@,Source2 Formats,Provides support for various formats used by the Source 2 engine.)
+NATIVE_PLUGINS+=source2
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
