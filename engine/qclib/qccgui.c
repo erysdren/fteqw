@@ -154,6 +154,7 @@ void AddSourceFile(const char *parentsrc, const char *filename);
 #define SCI_SETLEXER 4001
 #define SCI_SETPROPERTY 4004
 #define SCI_SETKEYWORDS 4005
+#define SCI_SETILEXER 4033
 
 #define SC_ORDER_PERFORMSORT 1
 
@@ -1277,6 +1278,16 @@ HWND CreateAnEditControl(HWND parent, pbool *scintillaokay)
 	{
 		FILE *f;
 		int i;
+		void *lexer;
+
+#ifdef SCISTATIC
+	extern void *CreateLexer(const char *name);
+	lexer = CreateLexer("cpp");
+#else
+#error TODO
+#endif
+
+		SendMessage(newc, SCI_SETILEXER, 0, (LPARAM)lexer);
 
 		SendMessage(newc, SCI_STYLERESETDEFAULT, 0, 0);
 		SendMessage(newc, SCI_STYLESETFONT, STYLE_DEFAULT, (LPARAM)"Consolas");
