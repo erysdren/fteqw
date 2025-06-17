@@ -92,7 +92,8 @@ VORBISVER=1.3.7
 VULKANVER=1.3.275.0
 SDL2VER=2.30.11
 SDL3VER=3.2.10
-SCINTILLAVER=373
+SCINTILLAVER=557
+LEXILLAVER=545
 OPUSVER=1.3.1
 SPEEXVER=1.2.0
 SPEEXDSPVER=1.2.0
@@ -2238,24 +2239,8 @@ qcc-dbg:
 qccgui-dbg:
 	@$(MAKE) _qcc-tmp TYPE=_out-dbg REQDIR=debugdir EXE_NAME="../fteqccgui$(BITS)" LTO= OUT_DIR="$(DEBUG_DIR)/$(NCDIRPREFIX)$(QCC_DIR)gui" SOBJS="qccgui.o qccguistuff.o packager.o decomp.o fteqcc.o" LDFLAGS="$(LDFLAGS) -lole32 -lcomdlg32 -lcomctl32 -lshlwapi -mwindows"
 
-
-#scintilla is messy as fuck when building statically. but at least we can strip out the lexers we don't use this way.
-#note that this is only used in the 'qccgui-scintilla' target.
-SCINTILLA_FILES= AutoComplete.o CallTip.o CaseConvert.o CaseFolder.o CellBuffer.o CharacterCategory.o CharacterSet.o CharClassify.o ContractionState.o Decoration.o Document.o EditModel.o Editor.o EditView.o KeyMap.o Indicator.o LineMarker.o MarginView.o PerLine.o PlatWin.o PositionCache.o PropSetSimple.o RESearch.o RunStyles.o Selection.o Style.o UniConversion.o ViewStyle.o XPM.o ScintillaWin.o HanjaDic.o ScintillaBase.o Accessor.o Catalogue.o ExternalLexer.o LexerBase.o LexerModule.o LexerSimple.o StyleContext.o WordList.o LexCPP.o
-SCINTILLA_ROOT=$(BASE_DIR)/scintilla$(SCINTILLAVER)/scintilla
-SCINTILLA_DIRS=$(SCINTILLA_ROOT)/lexers:$(SCINTILLA_ROOT)/lexlib:$(SCINTILLA_ROOT)/src:$(SCINTILLA_ROOT)/win32
-SCINTILLA_INC=-I$(SCINTILLA_ROOT)/include -I$(SCINTILLA_ROOT)/lexlib -I$(SCINTILLA_ROOT)/win32 -I$(SCINTILLA_ROOT)/src
-$(RELEASE_DIR)/scintilla$(BITS).a: $(foreach f,$(SCINTILLA_FILES),$(OUT_DIR)/$(f))
-	@$(AR) -r $@ $?
-	@$(AR) -s $@
-scintilla$(BITS)_static:
-	@test -f scintilla$(SCINTILLAVER).tar.gz || wget http://prdownloads.sourceforge.net/scintilla/scintilla$(SCINTILLAVER).tgz?download -O scintilla$(SCINTILLAVER).tar.gz
-	@-test -f $(SCINTILLA_ROOT) || (mkdir $(BASE_DIR)/scintilla$(SCINTILLAVER) && cd $(BASE_DIR)/scintilla$(SCINTILLAVER) && tar -xvzf ../scintilla$(SCINTILLAVER).tar.gz && cd scintilla && mv lexers/LexCPP.cxx . && rm lexers/Lex*.cxx && mv LexCPP.cxx lexers/ && cd scripts && python LexGen.py)
-	@$(MAKE) reldir OUT_DIR=$(RELEASE_DIR)/$(QCC_DIR)scin
-	@$(MAKE) $(RELEASE_DIR)/scintilla$(BITS).a VPATH="$(SCINTILLA_DIRS)" CFLAGS="$(SCINTILLA_INC) -DDISABLE_D2D -DSTATIC_BUILD -DSCI_LEXER -std=c++11" OUT_DIR=$(RELEASE_DIR)/$(QCC_DIR)scin WCFLAGS="$(WCFLAGS) -Os" WARNINGFLAGS=
-qccgui-scintilla: scintilla$(BITS)_static
-	#LTO bugs out on WinMain for some reason, so try to disable it for this target.
-	@LTO= $(MAKE) _qcc-tmp TYPE=_out-rel REQDIR=reldir EXE_NAME="../fteqccgui$(BITS)" OUT_DIR="$(RELEASE_DIR)/$(QCC_DIR)scin" SOBJS="qccgui.o qccguistuff.o packager.o decomp.o fteqcc.o" WCFLAGS="$(WCFLAGS) -DSCISTATIC" LDFLAGS="$(LDFLAGS) $(RELEASE_DIR)/scintilla$(BITS).a -static -luuid -lole32 -limm32 -lstdc++ -loleaut32 -lcomdlg32 -lcomctl32 -lshlwapi -mwindows"
+qccgui-scintilla: libs-$(ARCH)/libscintilla.a libs-$(ARCH)/liblexilla.a
+	@$(MAKE) _qcc-tmp TYPE=_out-rel REQDIR=reldir EXE_NAME="../fteqccgui$(BITS)" OUT_DIR="$(RELEASE_DIR)/$(QCC_DIR)scin" SOBJS="qccgui.o qccguistuff.o packager.o decomp.o fteqcc.o" WCFLAGS="$(WCFLAGS) -DSCISTATIC" LDFLAGS="$(LDFLAGS) libs-$(ARCH)/libscintilla.a libs-$(ARCH)/liblexilla.a -static -luuid -lole32 -limm32 -lstdc++ -loleaut32 -lcomdlg32 -lcomctl32 -lshlwapi -mwindows"
 
 ifdef windir
 outdir:
@@ -2549,6 +2534,16 @@ libs-$(ARCH)/libBulletDynamics.a:
 libs-$(ARCH)/vulkan/vulkan.h:
 	test -f vulkan-sdk-$(VULKANVER).tar.gz || wget https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/vulkan-sdk-$(VULKANVER).tar.gz  
 	cd libs-$(ARCH) && tar -xvzf ../vulkan-sdk-$(VULKANVER).tar.gz --strip-components=2 Vulkan-Headers-vulkan-sdk-$(VULKANVER)/include/
+
+ifeq (win,$(findstring win,$(FTE_TARGET)))
+libs-$(ARCH)/libscintilla.a:
+	test -f scintilla$(SCINTILLAVER).tar.gz || wget http://prdownloads.sourceforge.net/scintilla/scintilla$(SCINTILLAVER).tgz?download -O scintilla$(SCINTILLAVER).tar.gz
+	test -f libs-$(ARCH)/libscintilla.a || (mkdir -p libs-$(ARCH) && cd libs-$(ARCH) && tar -xvzf ../scintilla$(SCINTILLAVER).tar.gz && cd scintilla && $(MAKE) -Cwin32 AR="$(AR)" CC="$(CC)" CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS) -Os" CFLAGS="$(CFLAGS) -Os" $(TOOLOVERRIDES) ../bin/libscintilla.a && cp bin/libscintilla.a ..)
+
+libs-$(ARCH)/liblexilla.a:
+	test -f lexilla$(LEXILLAVER).tar.gz || wget http://prdownloads.sourceforge.net/scintilla/lexilla$(LEXILLAVER).tgz?download -O lexilla$(LEXILLAVER).tar.gz
+	test -f libs-$(ARCH)/liblexilla.a || (mkdir -p libs-$(ARCH) && cd libs-$(ARCH) && tar -xvzf ../lexilla$(LEXILLAVER).tar.gz && cd lexilla && mv lexers/LexCPP.cxx . && rm lexers/Lex*.cxx && mv LexCPP.cxx lexers/ && cd scripts && python LexillaGen.py && cd .. && $(MAKE) -Csrc AR="$(AR)" CC="$(CC)" CXX="$(CXX)" CXXFLAGS="$(CXXFLAGS) -Os" CFLAGS="$(CFLAGS) -Os" $(TOOLOVERRIDES) ../bin/liblexilla.a && cp bin/liblexilla.a ..)
+endif
 
 ifeq ($(FTE_TARGET),web)
 makelibs: libs-$(ARCH)/libz.a $(MAKELIBS)
