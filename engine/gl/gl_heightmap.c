@@ -8790,7 +8790,6 @@ void *Mod_LoadTerrainInfo(model_t *mod, char *loadname, qboolean force)
 }
 
 #ifdef HAVE_CLIENT
-#if 0 //not yet ready
 struct ted_import_s
 {
 	size_t x, y;
@@ -8826,14 +8825,17 @@ static void Mod_Terrain_Import_f(void)
 		return;
 	}
 	if (*mapname)
-		mod = NULL;//Mod_FindName(va("maps/%s", mapname));
+		mod = Mod_FindName(va("maps/%s", mapname));
 	else
 		mod = cl.worldmodel;
 	if (!mod || mod->type == mod_dummy)
 		return;
 	hm = mod->terrain;
 	if (!hm)
+	{
+		Con_Printf("No terrain on %s\n", mapname);
 		return;
+	}
 
 	fsize = 0;
 	filename = va("maps/%s.r16", mapname);
@@ -8851,6 +8853,7 @@ static void Mod_Terrain_Import_f(void)
 	if (fsize == ctx.width*ctx.height*2)
 		ted_itterate(hm, tid_flat, pos, max(ctx.width, ctx.height), 1, SECTHEIGHTSIZE, ted_import_heights_r16, &ctx);
 	FS_FreeFile(ctx.data);
+	Con_Printf("Imported %s\n", filename);
 }
 static void Mod_Terrain_Export_f(void)
 {
@@ -8950,11 +8953,7 @@ static void Mod_Terrain_Export_f(void)
 			if (populated)
 			{
 				if (FS_WriteFile(filename, ctx.data, ctx.width*ctx.height*2, FS_GAMEONLY))
-				{
-					char sysname[1024];
-					FS_NativePath(filename, FS_GAMEONLY, sysname, sizeof(sysname));
-					Con_Printf("Wrote %s\n", sysname);
-				}
+					Con_Printf("Wrote %s\n", filename);
 				else
 					Con_Printf("Unable to write %s\n", filename);
 			}
@@ -8971,7 +8970,6 @@ static void Mod_Terrain_Export_f(void)
 		w -= ctx.width;
 	}
 }
-#endif
 
 void Mod_Terrain_Create_f(void)
 {
@@ -9218,8 +9216,8 @@ void Terr_Init(void)
 	Cmd_AddCommand("mod_terrain_save", Mod_Terrain_Save_f);
 	Cmd_AddCommand("mod_terrain_reload", Mod_Terrain_Reload_f);
 #ifdef HAVE_CLIENT
-//	Cmd_AddCommandD("mod_terrain_export", Mod_Terrain_Export_f, "Export a raw heightmap");
-//	Cmd_AddCommandD("mod_terrain_import", Mod_Terrain_Import_f, "Import a raw heightmap");
+	Cmd_AddCommandD("mod_terrain_export", Mod_Terrain_Export_f, "Export a raw heightmap");
+	Cmd_AddCommandD("mod_terrain_import", Mod_Terrain_Import_f, "Import a raw heightmap");
 	Cmd_AddCommand("mod_terrain_create", Mod_Terrain_Create_f);
 	Cmd_AddCommandD("mod_terrain_convert", Mod_Terrain_Convert_f, "mod_terrain_convert [mapname] [texkill]\nConvert a terrain to the current format. If texkill is specified, only tiles with the named texture will be converted, and tiles with that texture will be stripped. This is a slow operation.");
 
