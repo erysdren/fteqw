@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with gta3's file formats
+$(PLUG_PREFIX)gta3$(PLUG_NATIVE_EXT): gta3/gta3.c gta3/fs_gta3.c gta3/mod_gta3.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,gta3,$@,GTA3 Formats,Provides support for various formats used by Grand Theft Auto 3.)
+NATIVE_PLUGINS+=gta3
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
