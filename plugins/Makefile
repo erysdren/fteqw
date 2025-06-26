@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with thps's file formats
+$(PLUG_PREFIX)thps$(PLUG_NATIVE_EXT): thps/thps.c thps/mod_psx.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,thps,$@,THPS Formats,Provides support for various formats used by Tony Hawk's Pro Skater.)
+NATIVE_PLUGINS+=thps
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
