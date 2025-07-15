@@ -266,7 +266,7 @@ qboolean NET_RegisterCrypto(void *module, ftecrypto_t *driver)
 	}
 }
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && defined(HAVE_SSL)
 static void TLS_Provider_Test_f(void)
 {
 	int i;

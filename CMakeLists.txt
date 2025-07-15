@@ -283,6 +283,22 @@ ELSE()
 	SET(FTE_WERROR_ARG "")
 ENDIF()
 
+IF(EMSCRIPTEN)
+	if(CMAKE_BUILD_TYPE MATCHES "Debug")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -gsource-map")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sSAFE_HEAP=1 -sALIASING_FUNCTION_POINTERS=0 -sASSERTIONS=2")
+	endif()
+	add_link_options(--pre-js ${PROJECT_SOURCE_DIR}/engine/web/prejs.js)
+	add_link_options(--js-library ${PROJECT_SOURCE_DIR}/engine/web/ftejslib.js)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sLEGACY_GL_EMULATION=0") #simplify the opengl wrappers.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sNO_FILESYSTEM=1") #we have our own.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sFILESYSTEM=0") #we have our own.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_MEMORY_GROWTH=1") #reduce crashes...
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sMAX_WEBGL_VERSION=2") #make use of what we can.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sTOTAL_STACK=5MB") #big!
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sERROR_ON_UNDEFINED_SYMBOLS=1") #fairly obvious. no runtime errors please.
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sTOTAL_MEMORY=268435456") #256mb
+ENDIF()
 IF(CMAKE_C_COMPILER_ID MATCHES "Clang")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-sign")
 
@@ -426,6 +442,16 @@ IF(SDL3_FOUND)	#SDL3
 		)
 		SET(FTESV_LIBS ${FTESV_LIBS} pthread)
 	ENDIF()
+ELSEIF(EMSCRIPTEN)
+	SET(FTE_DEFINES ${FTE_DEFINES};FTE_TARGET_WEB;OMIT_QCC;GL_STATIC;GLQUAKE)
+	SET(FTE_LIBS ${FTE_LIBS} ${SYS_LIBS})
+	SET(FTE_ARCH_FILES
+		engine/web/sys_web.c
+		engine/web/fs_web.c
+		engine/web/gl_vidweb.c
+		engine/client/cd_null.c
+		engine/client/snd_al.c
+	)
 ELSEIF(${ANDROID})
 #	FIND_PACKAGE(Freetype REQUIRED)
 
