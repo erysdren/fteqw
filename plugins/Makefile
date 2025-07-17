@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with voxlap's file formats
+$(PLUG_PREFIX)voxlap$(PLUG_NATIVE_EXT): voxlap/voxlap.c voxlap/img_kv6.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,voxlap,$@,Voxlap Formats,Provides support for various formats used by Ken Silverman's Voxlap engine.)
+NATIVE_PLUGINS+=voxlap
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
