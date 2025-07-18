@@ -523,6 +523,14 @@ $(PLUG_PREFIX)cod$(PLUG_NATIVE_EXT): cod/codmod.c cod/codbsp.c cod/codmat.c cod/
 NATIVE_PLUGINS+=cod
 ######################################
 
+######################################
+#for compat with old unreal's file formats
+$(PLUG_PREFIX)oldunreal$(PLUG_NATIVE_EXT): oldunreal/oldunreal.c oldunreal/upkg.c plugin.c
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(call EMBEDMETA,oldunreal,$@,Old Unreal Formats,Provides support for various formats used by old Unreal Engine games.)
+NATIVE_PLUGINS+=oldunreal
+######################################
+
 
 
 ifeq ($(findstring win,$(FTE_TARGET)),win)
