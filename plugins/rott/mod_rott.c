@@ -282,6 +282,110 @@ static qboolean is_sky_index(int in)
 		return false;
 }
 
+static qboolean is_window_index(int in)
+{
+	return in == 13;
+}
+
+static qboolean is_door_index(int in)
+{
+	if ((in >= 33) && (in <= 35))
+		return true;
+	else if ((in >= 90) && (in <= 104))
+		return true;
+	else if ((in >= 154) && (in <= 156))
+		return true;
+	else
+		return false;
+}
+
+static qboolean is_maskwall_index(int in)
+{
+	if ((in >= 157) && (in <= 160))
+		return true;
+	else if ((in >= 162) && (in <= 179))
+		return true;
+	else
+		return false;
+}
+
+// rt_door.h
+#define MW_SHOOTABLE       0x01
+#define MW_BLOCKING        0x02
+#define MW_MULTI           0x04
+#define MW_BLOCKINGCHANGES 0x08
+#define MW_ABOVEPASSABLE   0x10
+#define MW_NONDOGBLOCKING  0x20
+#define MW_WEAPONBLOCKING  0x40
+#define MW_BOTTOMPASSABLE  0x80
+#define MW_MIDDLEPASSABLE  0x100
+#define MW_ABP             0x200
+#define MW_SWITCHON        0x400
+#define MW_BOTTOMFLIPPING  0x800
+#define MW_TOPFLIPPING     0x1000
+
+static int get_maskwall_flags(int in)
+{
+	switch (in)
+	{
+		case 157: return MW_BLOCKING;
+		case 158: return MW_MULTI|MW_BLOCKING|MW_BLOCKINGCHANGES|MW_SHOOTABLE;
+		case 159: return MW_MULTI|MW_BLOCKING|MW_BLOCKINGCHANGES|MW_SHOOTABLE;
+		case 160: return MW_MULTI|MW_BLOCKING|MW_BLOCKINGCHANGES|MW_SHOOTABLE;
+		// 161 was removed
+		case 162: return MW_SHOOTABLE|MW_BLOCKING;
+		case 163: return MW_BLOCKING;
+		case 164: return MW_SHOOTABLE|MW_BLOCKING;
+		case 165: return MW_BLOCKING;
+		case 166: return MW_SHOOTABLE|MW_BLOCKING;
+		case 167: return MW_BLOCKING;
+		case 168: return MW_SHOOTABLE|MW_BLOCKINGCHANGES|MW_BLOCKING;
+		case 169: return MW_BOTTOMPASSABLE;
+		case 170: return MW_NONDOGBLOCKING|MW_WEAPONBLOCKING;
+		case 171: return MW_WEAPONBLOCKING|MW_BLOCKING;
+		case 172: return MW_BOTTOMPASSABLE;
+		case 173: return MW_BOTTOMPASSABLE;
+		case 174: return MW_BLOCKING;
+		case 175: return MW_BLOCKING|MW_SWITCHON;
+		case 176: return MW_BOTTOMPASSABLE;
+		case 177: return MW_BOTTOMPASSABLE;
+		case 178: return MW_BOTTOMPASSABLE;
+		case 179: return MW_ABOVEPASSABLE|MW_MIDDLEPASSABLE;
+		default: return 0;
+	}
+}
+
+static const char *get_maskwall_texture(int in)
+{
+	switch (in)
+	{
+		case 157: return "HSWITCH3";
+		case 158: return "MULTI1";
+		case 159: return "MULTI2";
+		case 160: return "MULTI3";
+		// 161 was removed
+		case 162: return "MASKED1";
+		case 163: return "MASKED1";
+		case 164: return "MASKED2";
+		case 165: return "MASKED2";
+		case 166: return "MASKED3";
+		case 167: return "MASKED3";
+		case 168: return "MASKED4";
+		case 169: return "MASKED4";
+		case 170: return "DOGMASK";
+		case 171: return "PEEPMASK";
+		case 172: return "EXITARCH";
+		case 173: return "EXITARCA";
+		case 174: return "ENTRARCH";
+		case 175: return "HSWITCH4";
+		case 176: return "MULTI1";
+		case 177: return "MULTI2";
+		case 178: return "MULTI3";
+		case 179: return "RAILING";
+		default: return NULL;
+	}
+}
+
 static const char *get_wall_texture(int in)
 {
 	if ((in >= 1) && (in <= 32))
@@ -314,7 +418,7 @@ static const char *get_wall_texture(int in)
 		return NULL;
 }
 
-static int convert_level_height(int in)
+static int get_level_height(int in)
 {
 	if (in >= 90 && in <= 97)
 		return in - 89;
@@ -324,7 +428,7 @@ static int convert_level_height(int in)
 		return 1;
 }
 
-static const char *convert_sky_texture(int in)
+static const char *get_sky_texture(int in)
 {
 	if (!is_sky_index(in))
 		return NULL;
@@ -332,7 +436,7 @@ static const char *convert_sky_texture(int in)
 	return rott_skies_texnames[in - 234];
 }
 
-static int convert_level_brightness(int in)
+static int get_level_brightness(int in)
 {
 	if (in >= 216 && in <= 223)
 		return in - 216;
@@ -569,6 +673,161 @@ static void add_surface(q2mapsurface_t **surfaces, size_t *num_surfaces, const c
 	(*num_surfaces)++;
 }
 
+// dir is 0=north 1=east 2=south 3=west 4=up 5=down
+static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, int dir, int neighbor_tile, int level_height)
+{
+	int i;
+	index_t v[4];
+	rottmapinfo_t *prv = (rottmapinfo_t *)mod->meshinfo;
+
+	// vertices
+	for (i = 0; i < 4; i++)
+	{
+		int ofs = base * 4 + i;
+
+		switch (dir)
+		{
+			case 0: // north
+				if (i == 0 || i == 3)
+					mesh->xyz_array[ofs][0] = (x * 64);
+				else
+					mesh->xyz_array[ofs][0] = (x * 64) + 64;
+				mesh->xyz_array[ofs][1] = (y * 64) + 64;
+				if (is_maskwall_index(neighbor_tile))
+					mesh->xyz_array[ofs][1] += 32;
+				break;
+
+			case 1: // east
+				mesh->xyz_array[ofs][0] = (x * 64) + 64;
+				if (i == 0 || i == 3)
+					mesh->xyz_array[ofs][1] = (y * 64);
+				else
+					mesh->xyz_array[ofs][1] = (y * 64) + 64;
+				if (is_maskwall_index(neighbor_tile))
+					mesh->xyz_array[ofs][0] += 32;
+				break;
+
+			case 2: // south
+				if (i == 0 || i == 3)
+					mesh->xyz_array[ofs][0] = (x * 64);
+				else
+					mesh->xyz_array[ofs][0] = (x * 64) + 64;
+				mesh->xyz_array[ofs][1] = (y * 64);
+				if (is_maskwall_index(neighbor_tile))
+					mesh->xyz_array[ofs][1] -= 32;
+				break;
+
+			case 3: // west
+				mesh->xyz_array[ofs][0] = (x * 64);
+				if (i == 0 || i == 3)
+					mesh->xyz_array[ofs][1] = (y * 64);
+				else
+					mesh->xyz_array[ofs][1] = (y * 64) + 64;
+				if (is_maskwall_index(neighbor_tile))
+					mesh->xyz_array[ofs][0] -= 32;
+				break;
+
+			case 4: // up
+			case 5: // down
+				if (i == 0 || i == 3)
+					mesh->xyz_array[ofs][0] = (x * 64);
+				else
+					mesh->xyz_array[ofs][0] = (x * 64) + 64;
+				if (i == 0 || i == 1)
+					mesh->xyz_array[ofs][1] = (y * 64);
+				else
+					mesh->xyz_array[ofs][1] = (y * 64) + 64;
+				break;
+		}
+
+		if (dir == 4 || dir == 5)
+		{
+			if (dir == 4)
+				mesh->xyz_array[ofs][2] = level_height * 64;
+			else if (dir == 5)
+				mesh->xyz_array[ofs][2] = 0;
+
+			if (i == 0 || i == 3)
+				mesh->st_array[ofs][0] = 0;
+			else
+				mesh->st_array[ofs][0] = 1;
+			if (i >= 2)
+				mesh->st_array[ofs][1] = 1;
+			else
+				mesh->st_array[ofs][1] = 0;
+		}
+		else
+		{
+			if (i >= 2)
+				mesh->xyz_array[ofs][2] = 0;
+			else
+				mesh->xyz_array[ofs][2] = level_height * 64;
+
+			// setup texcoords
+			if (i == 0 || i == 3)
+				mesh->st_array[ofs][0] = 0;
+			else
+				mesh->st_array[ofs][0] = 1;
+			if (i >= 2)
+				mesh->st_array[ofs][1] = level_height;
+			else
+				mesh->st_array[ofs][1] = 0;
+
+			// handle maskwall flags
+			if (is_maskwall_index(neighbor_tile))
+			{
+				int flags = get_maskwall_flags(neighbor_tile);
+
+				if (flags & MW_ABOVEPASSABLE || flags & MW_MIDDLEPASSABLE)
+				{
+					if (i >= 2)
+						mesh->st_array[ofs][1] = 1;
+					else
+						mesh->xyz_array[ofs][2] = 64;
+				}
+			}
+		}
+
+		// offset the whole map to center it in the grid space
+		mesh->xyz_array[ofs][0] -= 4096;
+		mesh->xyz_array[ofs][1] -= 4096;
+
+		v[i] = ofs;
+	}
+
+	// faces
+	if (dir == 0 || dir == 3)
+	{
+		mesh->indexes[base * 6 + 0] = v[1];
+		mesh->indexes[base * 6 + 1] = v[2];
+		mesh->indexes[base * 6 + 2] = v[3];
+
+		mesh->indexes[base * 6 + 3] = v[0];
+		mesh->indexes[base * 6 + 4] = v[1];
+		mesh->indexes[base * 6 + 5] = v[3];
+	}
+	else if (dir == 4)
+	{
+		mesh->indexes[base * 6 + 0] = v[0];
+		mesh->indexes[base * 6 + 1] = v[1];
+		mesh->indexes[base * 6 + 2] = v[2];
+
+		mesh->indexes[base * 6 + 3] = v[0];
+		mesh->indexes[base * 6 + 4] = v[2];
+		mesh->indexes[base * 6 + 5] = v[3];
+	}
+	else
+	{
+		mesh->indexes[base * 6 + 0] = v[3];
+		mesh->indexes[base * 6 + 1] = v[2];
+		mesh->indexes[base * 6 + 2] = v[1];
+
+		mesh->indexes[base * 6 + 3] = v[3];
+		mesh->indexes[base * 6 + 4] = v[1];
+		mesh->indexes[base * 6 + 5] = v[0];
+	}
+}
+
 static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize)
 {
 	int i, j, k;
@@ -610,7 +869,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 	level_floor = prv->mapplanes[0][0][0];
 	level_ceiling = prv->mapplanes[0][0][1];
 	level_floor_texname = convert_updn_texture(level_floor);
-	level_ceiling_texname = is_sky_index(level_ceiling) ? convert_sky_texture(level_ceiling) : convert_updn_texture(level_ceiling);
+	level_ceiling_texname = is_sky_index(level_ceiling) ? get_sky_texture(level_ceiling) : convert_updn_texture(level_ceiling);
 
 	// create surfaces in each area
 	memset(areasurfaces, 0, sizeof(areasurfaces));
@@ -620,6 +879,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 		for (x = 0; x < MAP_WIDTH; x++)
 		{
 			int neighbors[4]; // n e s w
+			int infoneighbors[4]; // n e s w
 			int area = prv->mapplanes[0][y][x] - FIRST_AREATILE;
 			if (area < 0 || area >= NUM_AREATILES)
 				continue;
@@ -629,10 +889,19 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			neighbors[2] = y > 0 ? prv->mapplanes[0][y - 1][x] : -1;
 			neighbors[3] = x > 0 ? prv->mapplanes[0][y][x - 1] : -1;
 
+			infoneighbors[0] = y < MAP_HEIGHT - 1 ? prv->mapplanes[2][y + 1][x] : -1;
+			infoneighbors[1] = x < MAP_WIDTH - 1 ? prv->mapplanes[2][y][x + 1] : -1;
+			infoneighbors[2] = y > 0 ? prv->mapplanes[2][y - 1][x] : -1;
+			infoneighbors[3] = x > 0 ? prv->mapplanes[2][y][x - 1] : -1;
+
 			// create neighboring wall surfaces
 			for (i = 0; i < 4; i++)
 			{
 				const char *texname = get_wall_texture(neighbors[i]);
+				if (is_maskwall_index(neighbors[i]))
+					texname = get_maskwall_texture(neighbors[i]);
+				if (is_window_index(infoneighbors[i]))
+					texname = level_ceiling_texname;
 				if (!texname)
 					continue;
 				add_surface(&areasurfaces[area], &prv->areas[area].num_surfaces, texname);
@@ -655,6 +924,10 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 		{
 			// there's a valid texture for this wall, so add a brush
 			const char *texname = get_wall_texture(prv->mapplanes[0][y][x]);
+			if (is_maskwall_index(prv->mapplanes[0][y][x]))
+				texname = get_maskwall_texture(prv->mapplanes[0][y][x]);
+			if (is_window_index(prv->mapplanes[2][y][x]))
+				texname = level_ceiling_texname;
 			if (texname)
 			{
 				add_surface(&surfaces, &prv->num_surfaces, texname);
@@ -672,7 +945,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 	prv->brushsides = plugfuncs->GMalloc(&mod->memgroup, sizeof(*prv->brushsides) * prv->num_brushsides);
 
 	// get tilemap height
-	level_height = convert_level_height(prv->mapplanes[1][0][0]);
+	level_height = get_level_height(prv->mapplanes[1][0][0]);
 
 	// add a few more surfaces
 	add_surface(&surfaces, &prv->num_surfaces, level_floor_texname);
@@ -709,9 +982,13 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 		for (x = 0; x < MAP_WIDTH; x++)
 		{
 			const char *texname = get_wall_texture(prv->mapplanes[0][y][x]);
+			if (is_maskwall_index(prv->mapplanes[0][y][x]))
+				texname = get_maskwall_texture(prv->mapplanes[0][y][x]);
+			if (is_window_index(prv->mapplanes[2][y][x]))
+				texname = level_ceiling_texname;
 			if (!texname)
 				continue;
-			add_cube_brush(mod, i, x, y, 0, 1, 1, level_height, texname, FTECONTENTS_SOLID);
+			add_cube_brush(mod, i, x, y, 0, 1, 1, level_height, texname, is_window_index(prv->mapplanes[2][y][x]) ? FTECONTENTS_SKY : FTECONTENTS_SOLID);
 			i++;
 		}
 	}
@@ -741,7 +1018,10 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			q2mapsurface_t *surface;
 			mesh_t *mesh;
 			int neighbors[4]; // n e s w
+			int infoneighbors[4]; // n e s w
 			int area = prv->mapplanes[0][y][x] - FIRST_AREATILE;
+			if (is_window_index(prv->mapplanes[2][y][x]))
+				continue;
 			if (area < 0 || area >= NUM_AREATILES)
 				continue;
 			if (!prv->areas[area].num_surfaces || !prv->areas[area].surfaces)
@@ -752,10 +1032,19 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			neighbors[2] = y > 0 ? prv->mapplanes[0][y - 1][x] : -1;
 			neighbors[3] = x > 0 ? prv->mapplanes[0][y][x - 1] : -1;
 
+			infoneighbors[0] = y < MAP_HEIGHT - 1 ? prv->mapplanes[2][y + 1][x] : -1;
+			infoneighbors[1] = x < MAP_WIDTH - 1 ? prv->mapplanes[2][y][x + 1] : -1;
+			infoneighbors[2] = y > 0 ? prv->mapplanes[2][y - 1][x] : -1;
+			infoneighbors[3] = x > 0 ? prv->mapplanes[2][y][x - 1] : -1;
+
 			// neighboring walls
 			for (i = 0; i < 4; i++)
 			{
 				const char *texname = get_wall_texture(neighbors[i]);
+				if (is_maskwall_index(neighbors[i]))
+					texname = get_maskwall_texture(neighbors[i]);
+				if (is_window_index(infoneighbors[i]))
+					texname = level_ceiling_texname;
 				if (!texname)
 					continue;
 				surface = area_surface_for_name(&prv->areas[area], texname);
@@ -847,7 +1136,10 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			mesh_t *mesh;
 			int s;
 			int neighbors[4]; // n e s w
+			int infoneighbors[4]; // n e s w
 			int area = prv->mapplanes[0][y][x] - FIRST_AREATILE;
+			if (is_window_index(prv->mapplanes[2][y][x]))
+				continue;
 			if (area < 0 || area >= NUM_AREATILES)
 				continue;
 			if (!prv->areas[area].num_meshes || !prv->areas[area].meshes)
@@ -858,92 +1150,25 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			neighbors[2] = y > 0 ? prv->mapplanes[0][y - 1][x] : -1;
 			neighbors[3] = x > 0 ? prv->mapplanes[0][y][x - 1] : -1;
 
+			infoneighbors[0] = y < MAP_HEIGHT - 1 ? prv->mapplanes[2][y + 1][x] : -1;
+			infoneighbors[1] = x < MAP_WIDTH - 1 ? prv->mapplanes[2][y][x + 1] : -1;
+			infoneighbors[2] = y > 0 ? prv->mapplanes[2][y - 1][x] : -1;
+			infoneighbors[3] = x > 0 ? prv->mapplanes[2][y][x - 1] : -1;
+
 			// neighboring walls
 			for (i = 0; i < 4; i++)
 			{
 				const char *texname = get_wall_texture(neighbors[i]);
+				if (is_maskwall_index(neighbors[i]))
+					texname = get_maskwall_texture(neighbors[i]);
+				if (is_window_index(infoneighbors[i]))
+					texname = level_ceiling_texname;
 				if (!texname)
 					continue;
 				s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
 				mesh = &prv->areas[area].meshes[s];
 
-				/*
-				 * 0 -- 1
-				 * | \ B|
-				 * |A \ |
-				 * 3 -- 2
-				 */
-
-				// vertices
-				for (j = 0; j < 4; j++)
-				{
-					int ofs = areameshoffsets[area][s] * 4 + j;
-
-					switch (i)
-					{
-						case 0: // north
-							if (j == 0 || j == 3)
-								mesh->xyz_array[ofs][0] = (x * 64) + 64;
-							else
-								mesh->xyz_array[ofs][0] = (x * 64);
-							mesh->xyz_array[ofs][1] = (y * 64);
-							break;
-
-						case 1: // east
-							mesh->xyz_array[ofs][0] = (x * 64) + 64;
-							if (j == 0 || j == 3)
-								mesh->xyz_array[ofs][1] = (y * 64) + 64;
-							else
-								mesh->xyz_array[ofs][1] = (y * 64);
-							break;
-
-						case 2: // south
-							if (j == 0 || j == 3)
-								mesh->xyz_array[ofs][0] = (x * 64);
-							else
-								mesh->xyz_array[ofs][0] = (x * 64) + 64;
-							mesh->xyz_array[ofs][1] = (y * 64) + 64;
-							break;
-
-						case 3: // west
-							mesh->xyz_array[ofs][0] = (x * 64);
-							if (j == 0 || j == 3)
-								mesh->xyz_array[ofs][1] = (y * 64);
-							else
-								mesh->xyz_array[ofs][1] = (y * 64) + 64;
-							break;
-					}
-
-					if (j >= 2)
-						mesh->xyz_array[ofs][2] = 0;
-					else
-						mesh->xyz_array[ofs][2] = level_height * 64;
-
-					// setup texcoords
-					if (j == 0 || j == 3)
-						mesh->st_array[ofs][0] = 0;
-					else
-						mesh->st_array[ofs][0] = 1;
-					if (j >= 2)
-						mesh->st_array[ofs][1] = level_height;
-					else
-						mesh->st_array[ofs][1] = 0;
-
-					// offset the whole map to center it in the grid space
-					mesh->xyz_array[ofs][0] -= 4096;
-					mesh->xyz_array[ofs][1] -= 4096;
-
-					v[j] = ofs;
-				}
-
-				// faces
-				mesh->indexes[areameshoffsets[area][s] * 6 + 0] = v[1];
-				mesh->indexes[areameshoffsets[area][s] * 6 + 1] = v[0];
-				mesh->indexes[areameshoffsets[area][s] * 6 + 2] = v[3];
-
-				mesh->indexes[areameshoffsets[area][s] * 6 + 3] = v[1];
-				mesh->indexes[areameshoffsets[area][s] * 6 + 4] = v[3];
-				mesh->indexes[areameshoffsets[area][s] * 6 + 5] = v[2];
+				add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, i, neighbors[i], level_height);
 
 				areameshoffsets[area][s]++;
 			}
@@ -952,48 +1177,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			s = area_surface_for_name(&prv->areas[area], level_floor_texname) - prv->areas[area].surfaces;
 			mesh = &prv->areas[area].meshes[s];
 
-			// vertices
-			for (j = 0; j < 4; j++)
-			{
-				int ofs = areameshoffsets[area][s] * 4 + j;
-
-				if (j == 0 || j == 3)
-					mesh->xyz_array[ofs][0] = (x * 64);
-				else
-					mesh->xyz_array[ofs][0] = (x * 64) + 64;
-
-				if (j == 0 || j == 1)
-					mesh->xyz_array[ofs][1] = (y * 64);
-				else
-					mesh->xyz_array[ofs][1] = (y * 64) + 64;
-
-				mesh->xyz_array[ofs][2] = 0;
-
-				// offset the whole map to center it in the grid space
-				mesh->xyz_array[ofs][0] -= 4096;
-				mesh->xyz_array[ofs][1] -= 4096;
-
-				// setup texcoords
-				if (j == 0 || j == 3)
-					mesh->st_array[ofs][0] = 0;
-				else
-					mesh->st_array[ofs][0] = 1;
-				if (j >= 2)
-					mesh->st_array[ofs][1] = 1;
-				else
-					mesh->st_array[ofs][1] = 0;
-
-				v[j] = ofs;
-			}
-
-			// faces
-			mesh->indexes[areameshoffsets[area][s] * 6 + 0] = v[0];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 1] = v[1];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 2] = v[2];
-
-			mesh->indexes[areameshoffsets[area][s] * 6 + 3] = v[0];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 4] = v[2];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 5] = v[3];
+			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, 5, 0, level_height);
 
 			areameshoffsets[area][s]++;
 
@@ -1001,48 +1185,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			s = area_surface_for_name(&prv->areas[area], level_ceiling_texname) - prv->areas[area].surfaces;
 			mesh = &prv->areas[area].meshes[s];
 
-			// vertices
-			for (j = 0; j < 4; j++)
-			{
-				int ofs = areameshoffsets[area][s] * 4 + j;
-
-				if (j == 0 || j == 3)
-					mesh->xyz_array[ofs][0] = (x * 64);
-				else
-					mesh->xyz_array[ofs][0] = (x * 64) + 64;
-
-				if (j == 0 || j == 1)
-					mesh->xyz_array[ofs][1] = (y * 64);
-				else
-					mesh->xyz_array[ofs][1] = (y * 64) + 64;
-
-				mesh->xyz_array[ofs][2] = level_height * 64;
-
-				// offset the whole map to center it in the grid space
-				mesh->xyz_array[ofs][0] -= 4096;
-				mesh->xyz_array[ofs][1] -= 4096;
-
-				// setup texcoords
-				if (j == 0 || j == 3)
-					mesh->st_array[ofs][0] = 0;
-				else
-					mesh->st_array[ofs][0] = 1;
-				if (j >= 2)
-					mesh->st_array[ofs][1] = 1;
-				else
-					mesh->st_array[ofs][1] = 0;
-
-				v[j] = ofs;
-			}
-
-			// faces
-			mesh->indexes[areameshoffsets[area][s] * 6 + 0] = v[3];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 1] = v[2];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 2] = v[1];
-
-			mesh->indexes[areameshoffsets[area][s] * 6 + 3] = v[3];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 4] = v[1];
-			mesh->indexes[areameshoffsets[area][s] * 6 + 5] = v[0];
+			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, 4, 0, level_height);
 
 			areameshoffsets[area][s]++;
 		}
@@ -1058,250 +1201,6 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			b[s].mesh[b[s].meshes++] = &prv->areas[i].meshes[j];
 		}
 	}
-
-#if 0
-	// read in mesh data
-	offsets = plugfuncs->Malloc(sizeof(*offsets) * prv->num_surfaces);
-	memset(offsets, 0, sizeof(*offsets) * prv->num_surfaces);
-	for (y = 0; y < MAP_HEIGHT; y++)
-	{
-		for (x = 0; x < MAP_WIDTH; x++)
-		{
-			int v[8];
-			int s;
-			const char *texname = get_wall_texture(prv->mapplanes[0][y][x]);
-			if (!texname)
-				continue;
-			s = surface_for_name(prv, texname) - prv->surfaces;
-			/*
-			 * bottom    top
-			 * 0 -- 1    4 -- 5
-			 * |    |    |    |
-			 * |    |    |    |
-			 * 3 -- 2    7 -- 6
-			 *
-			 * north     south
-			 * 5 -- 4    7 -- 6
-			 * | \ B|    | \ B|
-			 * |A \ |    |A \ |
-			 * 1 -- 0    3 -- 2
-			 *
-			 * east      west
-			 * 6 -- 5    4 -- 7
-			 * | \ B|    | \ B|
-			 * |A \ |    |A \ |
-			 * 2 -- 1    0 -- 3
-			 */
-			// setup vertices
-			for (i = 0; i < 8; i++)
-			{
-				// positions
-				if (i == 0 || i == 3 || i == 4 || i == 7)
-					m[s].xyz_array[offsets[s] * 8 + i][0] = (x * 64);
-				else
-					m[s].xyz_array[offsets[s] * 8 + i][0] = (x * 64) + 64;
-				if (i == 0 || i == 1 || i == 4 || i == 5)
-					m[s].xyz_array[offsets[s] * 8 + i][1] = (y * 64);
-				else
-					m[s].xyz_array[offsets[s] * 8 + i][1] = (y * 64) + 64;
-				if (i < 4)
-					m[s].xyz_array[offsets[s] * 8 + i][2] = 0;
-				else
-					m[s].xyz_array[offsets[s] * 8 + i][2] = level_height * 64;
-				// texcoords
-				if (i == 0 || i == 2 || i == 4 || i == 6)
-					m[s].st_array[offsets[s] * 8 + i][0] = 0;
-				else
-					m[s].st_array[offsets[s] * 8 + i][0] = 1;
-				if (i < 4)
-					m[s].st_array[offsets[s] * 8 + i][1] = 1 * level_height;
-				else
-					m[s].st_array[offsets[s] * 8 + i][1] = 0;
-
-				// offset the whole map to center it in the grid space
-				m[s].xyz_array[offsets[s] * 8 + i][0] -= 4096;
-				m[s].xyz_array[offsets[s] * 8 + i][1] -= 4096;
-
-				// save indices
-				v[i] = offsets[s] * 8 + i;
-			}
-			// setup faces
-			for (i = 0; i < 4; i++)
-			{
-				int t[6];
-
-				switch (i)
-				{
-					// north
-					case 0:
-						t[0] = v[5];
-						t[1] = v[1];
-						t[2] = v[0];
-
-						t[3] = v[5];
-						t[4] = v[0];
-						t[5] = v[4];
-						break;
-
-					// east
-					case 1:
-						t[0] = v[6];
-						t[1] = v[2];
-						t[2] = v[1];
-
-						t[3] = v[6];
-						t[4] = v[1];
-						t[5] = v[5];
-						break;
-
-					// south
-					case 2:
-						t[0] = v[7];
-						t[1] = v[3];
-						t[2] = v[2];
-
-						t[3] = v[7];
-						t[4] = v[2];
-						t[5] = v[6];
-						break;
-
-					// west
-					case 3:
-						t[0] = v[4];
-						t[1] = v[0];
-						t[2] = v[3];
-
-						t[3] = v[4];
-						t[4] = v[3];
-						t[5] = v[7];
-						break;
-				}
-
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 0] = t[0];
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 1] = t[1];
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 2] = t[2];
-
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 3] = t[3];
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 4] = t[4];
-				m[s].indexes[offsets[s] * 24 + (i * 6) + 5] = t[5];
-			}
-			offsets[s]++;
-		}
-	}
-	plugfuncs->Free(offsets);
-
-	// read in mesh data for floor and ceiling
-	{
-		int s;
-
-		// floor
-		s = surface_for_name(prv, convert_updn_texture(level_floor)) - prv->surfaces;
-
-		m[s].xyz_array[0][0] = 0;
-		m[s].xyz_array[0][1] = 0;
-		m[s].xyz_array[0][2] = 0;
-
-		m[s].st_array[0][0] = 0;
-		m[s].st_array[0][1] = 0;
-
-		m[s].xyz_array[1][0] = MAP_WIDTH * 64;
-		m[s].xyz_array[1][1] = 0;
-		m[s].xyz_array[1][2] = 0;
-
-		m[s].st_array[1][0] = 1 * (MAP_WIDTH / 2);
-		m[s].st_array[1][1] = 0;
-
-		m[s].xyz_array[2][0] = MAP_WIDTH * 64;
-		m[s].xyz_array[2][1] = MAP_HEIGHT * 64;
-		m[s].xyz_array[2][2] = 0;
-
-		m[s].st_array[2][0] = 1 * (MAP_WIDTH / 2);
-		m[s].st_array[2][1] = 1 * (MAP_HEIGHT / 2);
-
-		m[s].xyz_array[3][0] = 0;
-		m[s].xyz_array[3][1] = MAP_HEIGHT * 64;
-		m[s].xyz_array[3][2] = 0;
-
-		m[s].st_array[3][0] = 0;
-		m[s].st_array[3][1] = 1 * (MAP_HEIGHT / 2);
-
-		m[s].indexes[0] = 2;
-		m[s].indexes[1] = 1;
-		m[s].indexes[2] = 0;
-
-		m[s].indexes[3] = 3;
-		m[s].indexes[4] = 2;
-		m[s].indexes[5] = 0;
-
-		// offset the whole map to center it in the grid space
-		m[s].xyz_array[0][0] -= 4096;
-		m[s].xyz_array[0][1] -= 4096;
-
-		m[s].xyz_array[1][0] -= 4096;
-		m[s].xyz_array[1][1] -= 4096;
-
-		m[s].xyz_array[2][0] -= 4096;
-		m[s].xyz_array[2][1] -= 4096;
-
-		m[s].xyz_array[3][0] -= 4096;
-		m[s].xyz_array[3][1] -= 4096;
-
-		// ceiling
-		if (is_sky_index(level_ceiling))
-			s = surface_for_name(prv, convert_sky_texture(level_ceiling)) - prv->surfaces;
-		else
-			s = surface_for_name(prv, convert_updn_texture(level_ceiling)) - prv->surfaces;
-
-		m[s].xyz_array[0][0] = 0;
-		m[s].xyz_array[0][1] = 0;
-		m[s].xyz_array[0][2] = level_height * 64;
-
-		m[s].st_array[0][0] = 0;
-		m[s].st_array[0][1] = 0;
-
-		m[s].xyz_array[1][0] = MAP_WIDTH * 64;
-		m[s].xyz_array[1][1] = 0;
-		m[s].xyz_array[1][2] = level_height * 64;
-
-		m[s].st_array[1][0] = 1 * (MAP_WIDTH / 2);
-		m[s].st_array[1][1] = 0;
-
-		m[s].xyz_array[2][0] = MAP_WIDTH * 64;
-		m[s].xyz_array[2][1] = MAP_HEIGHT * 64;
-		m[s].xyz_array[2][2] = level_height * 64;
-
-		m[s].st_array[2][0] = 1 * (MAP_WIDTH / 2);
-		m[s].st_array[2][1] = 1 * (MAP_HEIGHT / 2);
-
-		m[s].xyz_array[3][0] = 0;
-		m[s].xyz_array[3][1] = MAP_HEIGHT * 64;
-		m[s].xyz_array[3][2] = level_height * 64;
-
-		m[s].st_array[3][0] = 0;
-		m[s].st_array[3][1] = 1 * (MAP_HEIGHT / 2);
-
-		m[s].indexes[0] = 0;
-		m[s].indexes[1] = 1;
-		m[s].indexes[2] = 2;
-
-		m[s].indexes[3] = 0;
-		m[s].indexes[4] = 2;
-		m[s].indexes[5] = 3;
-
-		// offset the whole map to center it in the grid space
-		m[s].xyz_array[0][0] -= 4096;
-		m[s].xyz_array[0][1] -= 4096;
-
-		m[s].xyz_array[1][0] -= 4096;
-		m[s].xyz_array[1][1] -= 4096;
-
-		m[s].xyz_array[2][0] -= 4096;
-		m[s].xyz_array[2][1] -= 4096;
-
-		m[s].xyz_array[3][0] -= 4096;
-		m[s].xyz_array[3][1] -= 4096;
-	}
-#endif
 
 	// build batches
 	mod->fromgame = fg_new;
