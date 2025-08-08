@@ -355,6 +355,37 @@ static int get_maskwall_flags(int in)
 	}
 }
 
+static const char *get_maskwall_side_texture(int in)
+{
+	switch (in)
+	{
+		case 157: return NULL;
+		case 158: return "SIDE21";
+		case 159: return "SIDE21";
+		case 160: return "SIDE21";
+		// 161 was removed
+		case 162: return "SIDE21";
+		case 163: return "SIDE21";
+		case 164: return "SIDE21";
+		case 165: return "SIDE21";
+		case 166: return "SIDE21";
+		case 167: return "SIDE21";
+		case 168: return "SIDE21";
+		case 169: return "SIDE21";
+		case 170: return "SIDE21";
+		case 171: return "SIDE21";
+		case 172: return "SIDE21";
+		case 173: return "SIDE21";
+		case 174: return "SIDE21";
+		case 175: return NULL;
+		case 176: return "SIDE21";
+		case 177: return "SIDE21";
+		case 178: return "SIDE21";
+		case 179: return NULL;
+		default: return NULL;
+	}
+}
+
 static const char *get_maskwall_texture(int in)
 {
 	switch (in)
@@ -673,8 +704,15 @@ static void add_surface(q2mapsurface_t **surfaces, size_t *num_surfaces, const c
 	(*num_surfaces)++;
 }
 
-// dir is 0=north 1=east 2=south 3=west 4=up 5=down
-static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, int dir, int neighbor_tile, int level_height)
+#define NORTH 0
+#define EAST 1
+#define SOUTH 2
+#define WEST 3
+#define UP 4
+#define DOWN 5
+
+// dir and sidedir is 0=north 1=east 2=south 3=west 4=up 5=down
+static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, int dir, int neighbor_tile, int level_height, int sidedir)
 {
 	int i;
 	index_t v[4];
@@ -687,7 +725,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 
 		switch (dir)
 		{
-			case 0: // north
+			case NORTH:
 				if (i == 0 || i == 3)
 					mesh->xyz_array[ofs][0] = (x * 64);
 				else
@@ -697,7 +735,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 					mesh->xyz_array[ofs][1] += 32;
 				break;
 
-			case 1: // east
+			case EAST:
 				mesh->xyz_array[ofs][0] = (x * 64) + 64;
 				if (i == 0 || i == 3)
 					mesh->xyz_array[ofs][1] = (y * 64);
@@ -707,7 +745,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 					mesh->xyz_array[ofs][0] += 32;
 				break;
 
-			case 2: // south
+			case SOUTH:
 				if (i == 0 || i == 3)
 					mesh->xyz_array[ofs][0] = (x * 64);
 				else
@@ -717,7 +755,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 					mesh->xyz_array[ofs][1] -= 32;
 				break;
 
-			case 3: // west
+			case WEST:
 				mesh->xyz_array[ofs][0] = (x * 64);
 				if (i == 0 || i == 3)
 					mesh->xyz_array[ofs][1] = (y * 64);
@@ -727,8 +765,8 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 					mesh->xyz_array[ofs][0] -= 32;
 				break;
 
-			case 4: // up
-			case 5: // down
+			case UP:
+			case DOWN:
 				if (i == 0 || i == 3)
 					mesh->xyz_array[ofs][0] = (x * 64);
 				else
@@ -740,11 +778,30 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 				break;
 		}
 
-		if (dir == 4 || dir == 5)
+		if (sidedir >= NORTH)
 		{
-			if (dir == 4)
+			switch (sidedir)
+			{
+				case NORTH:
+					mesh->xyz_array[ofs][1] -= 32;
+					break;
+				case SOUTH:
+					mesh->xyz_array[ofs][1] += 32;
+					break;
+				case EAST:
+					mesh->xyz_array[ofs][0] += 32;
+					break;
+				case WEST:
+					mesh->xyz_array[ofs][0] -= 32;
+					break;
+			}
+		}
+
+		if (dir == UP || dir == DOWN)
+		{
+			if (dir == UP)
 				mesh->xyz_array[ofs][2] = level_height * 64;
-			else if (dir == 5)
+			else if (dir == DOWN)
 				mesh->xyz_array[ofs][2] = 0;
 
 			if (i == 0 || i == 3)
@@ -796,7 +853,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 	}
 
 	// faces
-	if (dir == 0 || dir == 3)
+	if (dir == NORTH || dir == WEST)
 	{
 		mesh->indexes[base * 6 + 0] = v[1];
 		mesh->indexes[base * 6 + 1] = v[2];
@@ -806,7 +863,7 @@ static void add_mesh_face(model_t *mod, mesh_t *mesh, int base, int x, int y, in
 		mesh->indexes[base * 6 + 4] = v[1];
 		mesh->indexes[base * 6 + 5] = v[3];
 	}
-	else if (dir == 4)
+	else if (dir == UP)
 	{
 		mesh->indexes[base * 6 + 0] = v[0];
 		mesh->indexes[base * 6 + 1] = v[1];
@@ -905,6 +962,45 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 				if (!texname)
 					continue;
 				add_surface(&areasurfaces[area], &prv->areas[area].num_surfaces, texname);
+				if (is_maskwall_index(neighbors[i]))
+				{
+					const char *left_texname, *right_texname;
+					texname = get_maskwall_side_texture(neighbors[i]);
+					if (!texname)
+					{
+						int left, right;
+
+						switch (i)
+						{
+							case NORTH:
+								left = prv->mapplanes[0][y + 1][x - 1];
+								right = prv->mapplanes[0][y + 1][x + 1];
+								break;
+							case EAST:
+								left = prv->mapplanes[0][y - 1][x + 1];
+								right = prv->mapplanes[0][y + 1][x + 1];
+								break;
+							case SOUTH:
+								left = prv->mapplanes[0][y - 1][x + 1];
+								right = prv->mapplanes[0][y - 1][x - 1];
+								break;
+							case WEST:
+								left = prv->mapplanes[0][y + 1][x - 1];
+								right = prv->mapplanes[0][y - 1][x - 1];
+								break;
+						}
+
+						left_texname = get_wall_texture(left);
+						right_texname = get_wall_texture(right);
+					}
+					else
+					{
+						left_texname = right_texname = texname;
+					}
+
+					add_surface(&areasurfaces[area], &prv->areas[area].num_surfaces, left_texname);
+					add_surface(&areasurfaces[area], &prv->areas[area].num_surfaces, right_texname);
+				}
 			}
 
 			// create floor and ceiling surfaces
@@ -932,6 +1028,12 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 			{
 				add_surface(&surfaces, &prv->num_surfaces, texname);
 				prv->num_brushes++;
+			}
+			if (is_maskwall_index(prv->mapplanes[0][y][x]))
+			{
+				texname = get_maskwall_side_texture(prv->mapplanes[0][y][x]);
+				if (texname)
+					add_surface(&surfaces, &prv->num_surfaces, texname);
 			}
 		}
 	}
@@ -1010,7 +1112,6 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 	mod->numsurfaces = prv->num_surfaces;
 
 	// accumulate vertices and indexes for each area
-	// FIXME: doesn't prune hidden or parallel faces
 	for (y = 0; y < MAP_HEIGHT; y++)
 	{
 		for (x = 0; x < MAP_WIDTH; x++)
@@ -1047,10 +1148,78 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 					texname = level_ceiling_texname;
 				if (!texname)
 					continue;
+
 				surface = area_surface_for_name(&prv->areas[area], texname);
 				mesh = &prv->areas[area].meshes[surface - prv->areas[area].surfaces];
 				mesh->numvertexes += 4;
 				mesh->numindexes += 6;
+
+				if (is_maskwall_index(neighbors[i]))
+				{
+					const char *left_texname, *right_texname;
+					texname = get_maskwall_side_texture(neighbors[i]);
+					if (!texname)
+					{
+						int left, right;
+
+						switch (i)
+						{
+							case NORTH:
+								left = prv->mapplanes[0][y + 1][x - 1];
+								right = prv->mapplanes[0][y + 1][x + 1];
+								break;
+							case EAST:
+								left = prv->mapplanes[0][y - 1][x + 1];
+								right = prv->mapplanes[0][y + 1][x + 1];
+								break;
+							case SOUTH:
+								left = prv->mapplanes[0][y - 1][x + 1];
+								right = prv->mapplanes[0][y - 1][x - 1];
+								break;
+							case WEST:
+								left = prv->mapplanes[0][y + 1][x - 1];
+								right = prv->mapplanes[0][y - 1][x - 1];
+								break;
+						}
+
+						left_texname = get_wall_texture(left);
+						right_texname = get_wall_texture(right);
+					}
+					else
+					{
+						left_texname = right_texname = texname;
+					}
+
+					// left side
+					if (left_texname)
+					{
+						surface = area_surface_for_name(&prv->areas[area], left_texname);
+						mesh = &prv->areas[area].meshes[surface - prv->areas[area].surfaces];
+						mesh->numvertexes += 4;
+						mesh->numindexes += 6;
+					}
+
+					// right side
+					if (right_texname)
+					{
+						surface = area_surface_for_name(&prv->areas[area], right_texname);
+						mesh = &prv->areas[area].meshes[surface - prv->areas[area].surfaces];
+						mesh->numvertexes += 4;
+						mesh->numindexes += 6;
+					}
+
+					// floor
+					surface = area_surface_for_name(&prv->areas[area], level_floor_texname);
+					mesh = &prv->areas[area].meshes[surface - prv->areas[area].surfaces];
+					mesh->numvertexes += 4;
+					mesh->numindexes += 6;
+
+					// ceiling
+					surface = area_surface_for_name(&prv->areas[area], level_ceiling_texname);
+					mesh = &prv->areas[area].meshes[surface - prv->areas[area].surfaces];
+					mesh->numvertexes += 4;
+					mesh->numindexes += 6;
+				}
 			}
 
 			// floor
@@ -1167,26 +1336,75 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 					continue;
 				s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
 				mesh = &prv->areas[area].meshes[s];
-
-				add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, i, neighbors[i], level_height);
-
+				add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, i, neighbors[i], level_height, -1);
 				areameshoffsets[area][s]++;
+
+				// maskwall floor, ceiling and side walls
+				if (is_maskwall_index(neighbors[i]))
+				{
+					int sidedir, sx, sy;
+					const char *sidetexname = get_maskwall_side_texture(neighbors[i]);
+					if (sidetexname)
+						texname = sidetexname;
+
+					switch (i)
+					{
+						case NORTH: sx = x; sy = y + 1; break;
+						case EAST: sx = x + 1; sy = y; break;
+						case SOUTH: sx = x; sy = y - 1; break;
+						case WEST: sx = x - 1; sy = y; break;
+					}
+
+					// left side
+					switch (i)
+					{
+						case NORTH: sidedir = WEST; break;
+						case EAST: sidedir = NORTH; break;
+						case SOUTH: sidedir = EAST; break;
+						case WEST: sidedir = SOUTH; break;
+					}
+					s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
+					mesh = &prv->areas[area].meshes[s];
+					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, sidedir, 0, level_height, i);
+					areameshoffsets[area][s]++;
+
+					// right side
+					switch (i)
+					{
+						case NORTH: sidedir = EAST; break;
+						case EAST: sidedir = SOUTH; break;
+						case SOUTH: sidedir = WEST; break;
+						case WEST: sidedir = NORTH; break;
+					}
+					s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
+					mesh = &prv->areas[area].meshes[s];
+					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, sidedir, 0, level_height, i);
+					areameshoffsets[area][s]++;
+
+					// floor
+					s = area_surface_for_name(&prv->areas[area], level_floor_texname) - prv->areas[area].surfaces;
+					mesh = &prv->areas[area].meshes[s];
+					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, DOWN, 0, level_height, i);
+					areameshoffsets[area][s]++;
+
+					// ceiling
+					s = area_surface_for_name(&prv->areas[area], level_ceiling_texname) - prv->areas[area].surfaces;
+					mesh = &prv->areas[area].meshes[s];
+					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, UP, 0, level_height, i);
+					areameshoffsets[area][s]++;
+				}
 			}
 
 			// floor
 			s = area_surface_for_name(&prv->areas[area], level_floor_texname) - prv->areas[area].surfaces;
 			mesh = &prv->areas[area].meshes[s];
-
-			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, 5, 0, level_height);
-
+			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, DOWN, 0, level_height, -1);
 			areameshoffsets[area][s]++;
 
 			// ceiling
 			s = area_surface_for_name(&prv->areas[area], level_ceiling_texname) - prv->areas[area].surfaces;
 			mesh = &prv->areas[area].meshes[s];
-
-			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, 4, 0, level_height);
-
+			add_mesh_face(mod, mesh, areameshoffsets[area][s], x, y, UP, 0, level_height, -1);
 			areameshoffsets[area][s]++;
 		}
 	}
