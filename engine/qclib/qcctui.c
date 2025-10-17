@@ -334,6 +334,7 @@ int main (int argc, const char **argv)
 				 !strcmp(argv[i], "-x") ||
 				 !strcmp(argv[i], "-p") ||
 				 !strcmp(argv[i], "-z") ||
+				 !strcmp(argv[i], "-s") ||
 				 !strcmp(argv[i], "-0") ||
 				 !strcmp(argv[i], "-9"))
 		{
@@ -474,6 +475,16 @@ int main (int argc, const char **argv)
 
 				if (Packager_CompressDir(argv[ziparg+1], t, QCC_PR_PackagerMessage, NULL))
 					return EXIT_SUCCESS;
+			}
+			break;
+		case 's':	// parse packager script
+			{	//exe -s foo.src
+				struct pkgctx_s *ctx;
+				ctx = Packager_Create(QCC_PR_PackagerMessage, NULL);
+				Packager_ParseFile(ctx, argv[ziparg+1]);
+				Packager_WriteDataset(ctx, NULL);
+				Packager_Destroy(ctx);
+				return EXIT_SUCCESS;
 			}
 			break;
 		default:

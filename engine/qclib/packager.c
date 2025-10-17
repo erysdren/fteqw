@@ -1737,7 +1737,7 @@ void Packager_ParseText(struct pkgctx_s *ctx, char *scripttext)
 	}
 }
 
-void Packager_ParseFile(struct pkgctx_s *ctx, char *scriptname)
+void Packager_ParseFile(struct pkgctx_s *ctx, const char *scriptname)
 {
 	size_t remaining = 0;
 	char *file = qccprogfuncs->funcs.parms->ReadFile(scriptname, NULL, NULL, &remaining, true);
