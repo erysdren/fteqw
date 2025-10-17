@@ -99,6 +99,7 @@ SPEEXDSPVER=1.2.0
 FREETYPEVER=2.10.1
 BULLETVER=2.87
 OPENSSLVER=3.0.1
+LUAVER=5.4.8
 
 #cygwin's make's paths confuses non-cygwin things
 RELEASE_DIR=$(BASE_DIR)/release
@@ -176,6 +177,9 @@ ifneq (,$(findstring DLINK_EZHUD,$(FTE_CONFIG_EXTRA)))
 endif
 ifneq (,$(findstring DLINK_OPENSSL,$(FTE_CONFIG_EXTRA)))
     LINK_OPENSSL=1
+endif
+ifneq (,$(findstring DUSE_LUA,$(FTE_CONFIG_EXTRA)))
+    USE_LUA=1
 endif
 
 ifeq ($(BITS),64)
@@ -1114,6 +1118,11 @@ ifeq (1,$(LINK_OPENSSL))
         ALL_DFLAGS+=$(shell $(PKGCONFIG) openssl --cflags --silence-errors)
         COMMONLDDEPS+=$(shell $(PKGCONFIG) openssl --libs --silence-errors)
     endif
+endif
+ifeq (1,$(strip $(USE_LUA)))
+    COMMONLDDEPS+=-llua
+    ALL_CFLAGS+=-DVM_LUA -DLIBLUA_STATIC
+    MAKELIBS+=libs-$(ARCH)/liblua.a
 endif
 
 ifeq (1,$(shell $(PKGCONFIG) --exists gnutls && echo 1))
@@ -2549,6 +2558,10 @@ libs-$(ARCH)/libBulletDynamics.a:
 libs-$(ARCH)/vulkan/vulkan.h:
 	test -f vulkan-sdk-$(VULKANVER).tar.gz || wget https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/vulkan-sdk-$(VULKANVER).tar.gz  
 	cd libs-$(ARCH) && tar -xvzf ../vulkan-sdk-$(VULKANVER).tar.gz --strip-components=2 Vulkan-Headers-vulkan-sdk-$(VULKANVER)/include/
+
+libs-$(ARCH)/liblua.a:
+	test -f lua-$(LUAVER).tar.gz || wget https://www.lua.org/ftp/lua-$(LUAVER).tar.gz
+	test -f libs-$(ARCH)/liblua.a || (mkdir -p libs-$(ARCH) && cd libs-$(ARCH) && tar -xvzf ../lua-$(LUAVER).tar.gz && cd lua-$(LUAVER) && $(TOOLOVERRIDES) $(MAKE) -Csrc liblua.a && cp src/liblua.a ..)
 
 ifeq ($(FTE_TARGET),web)
 makelibs: libs-$(ARCH)/libz.a $(MAKELIBS)

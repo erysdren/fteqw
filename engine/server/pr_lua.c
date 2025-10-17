@@ -2216,6 +2216,21 @@ static int luaB_next (lua_State *L) {
 static int bi_lua_pairs (lua_State *L) {
   return pairsmeta(L, "__pairs", 0, luaB_next);
 }
+
+static int ipairsaux (lua_State *L) {
+  lua_Integer i = luaL_checkinteger(L, 2);
+  i = luaL_intop(+, i, 1);
+  lua_pushinteger(L, i);
+  return (lua_geti(L, 1, i) == LUA_TNIL) ? 1 : 2;
+}
+
+static int bi_lua_ipairs (lua_State *L) {
+  luaL_checkany(L, 1);
+  lua_pushcfunction(L, ipairsaux);  /* iteration function */
+  lua_pushvalue(L, 1);  /* state */
+  lua_pushinteger(L, 0);  /* initial value */
+  return 3;
+}
 #endif
 
 static int bi_lua_objerror (lua_State *L)
@@ -2341,6 +2356,7 @@ static void my_lua_registerbuiltins(lua_State *L)
 	registerfuncn(require);		//'standard'ish, except uses quake's filesystem instead of reading random system paths.
 #ifdef LIBLUA_STATIC
 	registerfuncn(pairs);
+	registerfuncn(ipairs);
 #endif
 	lua_pushnil(L); lua_setglobal(L, "dofile");	//violates our sandbox
 	lua_pushnil(L); lua_setglobal(L, "loadfile"); //violates our sandbox
