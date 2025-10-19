@@ -507,8 +507,8 @@ static void PKG_ParseOldPack(struct pkgctx_s *ctx)
 	ctx->messagecallback(ctx->userctx, "no wildcard support, sorry\n");
 #endif
 }
-/*
-static void PKG_ParseDataset(struct pkgctx_s *ctx)
+
+static void PKG_ParseDataset(struct pkgctx_s *ctx, pbool diff)
 {
 	struct dataset_s *s;
 	char name[128];
@@ -520,15 +520,7 @@ static void PKG_ParseDataset(struct pkgctx_s *ctx)
 		return;
 	}
 
-	if (strlen(name) >= sizeof(s->name))
-	{
-		ctx->messagecallback(ctx->userctx, "Dataset '%s' name too long\n", name);
-		return;
-	}
-
-	s = malloc(sizeof(*s));
-	memset(s, 0, sizeof(*s));
-	strcpy(s->name, name);
+	s = PKG_GetDataset(ctx, name);
 
 	if (PKG_Expect(ctx, "{"))
 	{
@@ -541,7 +533,7 @@ static void PKG_ParseDataset(struct pkgctx_s *ctx)
 				if (PKG_GetToken(ctx, name, sizeof(name), false))
 					if (PKG_GetStringToken(ctx, prop, sizeof(prop)))
 					{
-						PKG_CreateOutput(ctx, s, name, prop);
+						PKG_CreateOutput(ctx, s, name, prop, diff);
 					}
 			}
 			else if (!strcmp(prop, "base"))
@@ -566,9 +558,9 @@ static void PKG_ParseDataset(struct pkgctx_s *ctx)
 		ctx->datasets = s;
 		return;
 	}
-	PKG_DestroyDataset(s);
+	// PKG_DestroyDataset(s);
 	return;
-}*/
+}
 
 static void PKG_ParseRule(struct pkgctx_s *ctx)
 {
@@ -1689,8 +1681,8 @@ void Packager_ParseText(struct pkgctx_s *ctx, char *scripttext)
 	ctx->listfile = scripttext;
 	while (PKG_GetToken(ctx, cmd, sizeof(cmd), true))
 	{
-//		if (!strcmp(cmd, "dataset"))
-//			PKG_ParseDataset(ctx);
+		if (!strcmp(cmd, "dataset"))
+			PKG_ParseDataset(ctx, false);
 		if (!strcmp(cmd, "output"))
 			PKG_ParseOutput(ctx, false);
 		else if (!strcmp(cmd, "diffoutput") || !strcmp(cmd, "splitoutput"))
