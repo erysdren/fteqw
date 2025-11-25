@@ -5984,7 +5984,7 @@ static void Sys_FindBaseDirs(const char *poshname, const char *gamename, void (*
 	}
 }
 #else
-#if (defined(__linux__) || defined(__unix__) || defined(__apple__)) && !defined(ANDROID)
+#if (defined(__linux__) || defined(__unix__) || defined(__apple__)) && !defined(ANDROID) && !defined(__DREAMCAST__)
 #include <sys/stat.h>
 
 static qboolean Sys_SteamLibraryHasFile(char *basepath, int basepathlen, char *librarypath, char *steamdir, char *fname)	//returns the base system path
@@ -6304,7 +6304,7 @@ static qboolean FS_DirHasGame(const char *basedir, int gameidx)
 	{
 		if (!gamemode_info[gameidx].auniquefile[j])
 			continue;	//no more
-#if defined(_WIN32) || defined(NOSTDIO) || !defined(_POSIX_C_SOURCE)	//systems that lack a working 'access' function.
+#if defined(_WIN32) || defined(NOSTDIO) || !defined(_POSIX_C_SOURCE) || defined(__DREAMCAST__)	//systems that lack a working 'access' function.
 		if (!Sys_EnumerateFiles(basedir, gamemode_info[gameidx].auniquefile[j], FS_DirDoesHaveGame, NULL, NULL))
 			return true;	//search was cancelled by the callback, so it actually got called.
 #else
@@ -8159,7 +8159,7 @@ void FS_ArbitraryFile_c(int argn, const char *partial, struct xcommandargcomplet
 	#endif
 #endif
 
-#if defined(_WIN32) && !defined(FTE_SDL) && !defined(WINRT) && !defined(_XBOX)
+#if defined(_WIN32) && !defined(FTE_SDL) && !defined(WINRT) && !defined(_XBOX) && !defined(__DREAMCAST__)
 //so this is kinda screwy
 //"CSIDL_LOCAL_APPDATA/FTE Quake" is what we switched to, but we only use it if the other home dirs don't exist
 //"CSIDL_PERSONAL(My Documents)/My Games/FTE Quake" is what we used to use... but personal now somehow means upload-to-internet in a nicely insecure we-own-all-your-data kind of way...
@@ -8313,7 +8313,7 @@ static qboolean FS_GetBestHomeDir(ftemanifest_t *manifest)
 
 	return false;
 }
-#elif defined(NOSTDIO)
+#elif defined(NOSTDIO) || defined(__DREAMCAST__)
 static qboolean FS_GetBestHomeDir(ftemanifest_t *man)
 {	//no studio? webgl port? no file system access = no homedirs!
 	return false;
