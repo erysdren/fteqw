@@ -29,7 +29,7 @@
 //#undef D3D9QUAKE
 //#undef D3D11QUAKE
 //#undef VKQUAKE
-//#undef HEADLESSQUAKE			//no-op renderer...
+#undef HEADLESSQUAKE			//no-op renderer...
 //#undef WAYLANDQUAKE			//linux only
 
 //Misc Renderer stuff
@@ -40,8 +40,8 @@
 
 //Extra misc features.
 //#define CLIENTONLY			//
-#define MULTITHREAD				//misc basic multithreading - dsound, downloads, basic stuff that's unlikely to have race conditions.
-#define LOADERTHREAD			//worker threads for loading misc stuff. falls back on main thread if not supported.
+//#define MULTITHREAD				//misc basic multithreading - dsound, downloads, basic stuff that's unlikely to have race conditions.
+//#define LOADERTHREAD			//worker threads for loading misc stuff. falls back on main thread if not supported.
 //#define AVAIL_DINPUT
 #define SIDEVIEWS   4   		//enable secondary/reverse views.
 #define MAX_SPLITS	4u
@@ -57,7 +57,7 @@
 //#define PACKAGE_DOOMWAD		//doom wad support (generates various file names, and adds support for doom's audio, sprites, etc)
 //#define AVAIL_XZDEC				//.xz decompression
 //#define AVAIL_GZDEC				//.gz decompression
-#define AVAIL_ZLIB				//whether pk3s can be compressed or not.
+//#define AVAIL_ZLIB				//whether pk3s can be compressed or not.
 //#define AVAIL_BZLIB			//whether pk3s can use bz2 compression
 //#define PACKAGE_DZIP			//.dzip support for smaller demos (which are actually more like pak files and can store ANY type of file)
 
@@ -99,8 +99,8 @@
 //#define IMAGEFMT_DDS			//.dds files embed mipmaps and texture compression. faster to load.
 //#define IMAGEFMT_TGA			//somewhat mandatory
 #define IMAGEFMT_LMP			//mandatory for quake
-#define IMAGEFMT_PNG			//common in quakeworld, useful for screenshots.
-#define IMAGEFMT_JPG			//common in quake3, useful for screenshots.
+//#define IMAGEFMT_PNG			//common in quakeworld, useful for screenshots.
+//#define IMAGEFMT_JPG			//common in quake3, useful for screenshots.
 //#define IMAGEFMT_GIF			//for the luls. loads as a texture2DArray
 //#define IMAGEFMT_BLP			//legacy crap
 //#define IMAGEFMT_BMP			//windows bmp. yuck. also includes .ico for the luls
@@ -143,7 +143,7 @@
 
 // Networking options
 #define NQPROT					//act as an nq client/server, with nq gamecode.
-#define HAVE_PACKET				//we can send unreliable messages!
+//#define HAVE_PACKET				//we can send unreliable messages!
 //#define HAVE_TCP				//we can create/accept TCP connections.
 //#define HAVE_GNUTLS				//on linux
 //#define HAVE_WINSSPI			//on windows

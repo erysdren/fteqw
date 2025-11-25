@@ -669,6 +669,7 @@ static void R_SetupGL (const float eyematrix[12]/*can be null*/, const vec4_t fo
 		}
 	}
 #endif
+#ifdef GL_DITHER
 	if (!gl_config.gles && gl_dither.modified)
 	{
 		gl_dither.modified = false;
@@ -681,6 +682,7 @@ static void R_SetupGL (const float eyematrix[12]/*can be null*/, const vec4_t fo
 			qglDisable(GL_DITHER);
 		}
 	}
+#endif
 }
 
 void Surf_SetupFrame(void);

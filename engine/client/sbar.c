@@ -166,9 +166,11 @@ static int Sbar_TopColour(player_info_t *p)
 		if (!Q_strcasecmp(p->team, "blue"))
 			return 13;
 	}
+#ifdef QWSKINS
 	if (scr_scoreboard_forcecolors.ival)
 		return p->ttopcolor;
 	else
+#endif
 		return p->rtopcolor;
 }
 
@@ -181,9 +183,11 @@ static int Sbar_BottomColour(player_info_t *p)
 		if (!Q_strcasecmp(p->team, "blue"))
 			return 13;
 	}
+#ifdef QWSKINS
 	if (scr_scoreboard_forcecolors.ival)
 		return p->tbottomcolor;
 	else
+#endif
 		return p->rbottomcolor;
 }
 

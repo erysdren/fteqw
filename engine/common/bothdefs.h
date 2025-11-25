@@ -285,6 +285,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#undef AVAIL_OGGVORBIS
 #endif
 
+#ifdef __DREAMCAST__
+	#define GLESONLY	//should reduce the conditions a little
+	#ifndef R_MAX_RECURSE
+		#define R_MAX_RECURSE 2 //less bss
+	#endif
+	#undef MULTITHREAD
+	#define NO_MULTITHREAD
+#endif
+
 #ifdef FTE_TARGET_WEB
 	//sandboxing means some stuff CANNOT work...
 	#undef HAVE_TCP		//websockets are not real tcp.

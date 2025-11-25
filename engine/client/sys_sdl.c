@@ -471,12 +471,12 @@ qboolean Sys_Rename (const char *oldfname, const char *newfname)
 }
 
 #ifndef _WIN32
-#if _POSIX_C_SOURCE >= 200112L
+#if _POSIX_C_SOURCE >= 200112L && !defined(__DREAMCAST__)
 	#include <sys/statvfs.h>
 #endif
 qboolean Sys_GetFreeDiskSpace(const char *path, quint64_t *freespace)
 {
-#if _POSIX_C_SOURCE >= 200112L
+#if _POSIX_C_SOURCE >= 200112L && !defined(__DREAMCAST__)
 	//posix 2001
 	struct statvfs inf;
 	if(0==statvfs(path, &inf))
@@ -669,7 +669,7 @@ int Sys_EnumerateFiles (const char *gpath, const char *match, int (QDECL *func)(
 	strcat(fullmatch, match);
 	return Sys_EnumerateFiles2(fullmatch, start, start, func, parm, spath);
 }
-#elif defined(linux) || defined(__unix__) || defined(__MACH__) || defined(__HAIKU__)
+#elif defined(linux) || defined(__unix__) || defined(__MACH__) || defined(__HAIKU__) || defined(__DREAMCAST__)
 #include <dirent.h>
 #include <errno.h>
 static int Sys_EnumerateFiles2 (const char *truepath, int apathofs, const char *match, int (*func)(const char *, qofs_t, time_t modtime, void *, searchpathfuncs_t *), void *parm, searchpathfuncs_t *spath)
@@ -1445,7 +1445,11 @@ int QDECL main(int argc, char **argv)
 #endif
 
 #if !defined(WIN32)
+#ifndef O_NDELAY
+	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | FNDELAY);
+#else
 	fcntl(0, F_SETFL, fcntl (0, F_GETFL, 0) | O_NDELAY);
+#endif
 #endif
 
 	COM_InitArgv (parms.argc, parms.argv);

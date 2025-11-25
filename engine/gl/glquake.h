@@ -81,7 +81,10 @@ void ModBrush_LoadGLStuff(void *ctx, void *data, size_t a, size_t b);	//data ===
 	#endif
 	#include "glsupp.h"
 			
-
+	#if defined(__DREAMCAST__)
+		#define GL_COLOR_ARRAY_POINTER 1
+		#undef GL_TEXTURE_ENV
+	#endif
 
 	/*gles2 has no fixed function*/
 #ifndef GL_ALPHA_TEST

@@ -31,29 +31,29 @@ typedef struct statmessage_s {
 	struct statmessage_s *next;
 } statmessage_t;
 
-typedef unsigned short stat;
+typedef unsigned short stat_t;
 typedef struct {
-	stat totaldeaths;
-	stat totalsuicides;
-	stat totalteamkills;
-	stat totalkills;
-	stat totaltouches;
-	stat totalcaps;
-	stat totaldrops;
+	stat_t totaldeaths;
+	stat_t totalsuicides;
+	stat_t totalteamkills;
+	stat_t totalkills;
+	stat_t totaltouches;
+	stat_t totalcaps;
+	stat_t totaldrops;
 
 	//I was going to keep track of kills with a certain gun - too much memory
 	//track only your own and total weapon kills rather than per client
 	struct wt_s {
 		//these include you.
-		stat kills;
-		stat teamkills;
-		stat suicides;		
+		stat_t kills;
+		stat_t teamkills;
+		stat_t suicides;
 
-		stat ownkills;
-		stat owndeaths;
-		stat ownteamkills;
-		stat ownteamdeaths;
-		stat ownsuicides;
+		stat_t ownkills;
+		stat_t owndeaths;
+		stat_t ownteamkills;
+		stat_t ownteamdeaths;
+		stat_t ownsuicides;
 		char *fullname;
 		char *abrev;
 		char *image;
@@ -61,17 +61,17 @@ typedef struct {
 	} weapontotals[MAX_WEAPONS];
 
 	struct ct_s {
-		stat caps;		//times they captured the flag
-		stat drops;		//times lost the flag
-		stat grabs;		//times grabbed flag
+		stat_t caps;		//times they captured the flag
+		stat_t drops;		//times lost the flag
+		stat_t grabs;		//times grabbed flag
 
-		stat owndeaths;	//times you killed them
-		stat ownkills;	//times they killed you
-		stat deaths;	//times they died (including by you)
-		stat kills;		//times they killed (including by you)
-		stat teamkills;	//times they killed a team member.
-		stat teamdeaths;	//times they died to a team member.
-		stat suicides;	//times they were stupid.
+		stat_t owndeaths;	//times you killed them
+		stat_t ownkills;	//times they killed you
+		stat_t deaths;	//times they died (including by you)
+		stat_t kills;		//times they killed (including by you)
+		stat_t teamkills;	//times they killed a team member.
+		stat_t teamdeaths;	//times they died to a team member.
+		stat_t suicides;	//times they were stupid.
 	} clienttotals[MAX_CLIENTS];
 
 	qboolean readcaps;
