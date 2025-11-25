@@ -237,5 +237,5 @@
 #endif
 //-DLINK_OPENSSL	//statically link our openssl plugin into the engine instead of being separate. NOTE: openssl<3 is a license no-go, 3 still requires gpl3 (2 prohits patent).
 
-//-Os		//optimise for size instead of speed. less cpu cache needed means that its sometimes faster anyway.
+-Os		//optimise for size instead of speed. less cpu cache needed means that its sometimes faster anyway.
 #endif
