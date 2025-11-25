@@ -455,6 +455,13 @@ ifeq ($(FTE_TARGET),dos)
 	CFLAGS+=-DNO_ZLIB
 endif
 
+ifeq ($(FTE_TARGET),kos)
+	CC=kos-cc
+	CXX=kos-c++
+	STRIP=kos-strip
+	BITS=32
+endif
+
 #if you have an x86, you can get gcc to build binaries using 3 different ABIs, instead of builds for just the default ABI
 ifeq ($(FTE_TARGET),linux32)
 	FTE_TARGET=linux
