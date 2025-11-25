@@ -460,6 +460,9 @@ ifeq ($(FTE_TARGET),kos)
 	CXX=kos-c++
 	STRIP=kos-strip
 	BITS=32
+	USE_SPEEX=0
+	USE_VORBISFILE=0
+	BASELDFLAGS=
 endif
 
 #if you have an x86, you can get gcc to build binaries using 3 different ABIs, instead of builds for just the default ABI

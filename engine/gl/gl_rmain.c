@@ -2266,9 +2266,12 @@ void GLR_RenderView (void)
 		sourcetex = R2D_RT_Configure("rt/$lastgameview", vid.fbpwidth, vid.fbpheight, fmt, rtflags);
 		if (fbdepth)
 		{
+#ifdef RTLIGHTS
 			if (sh_config.texfmt[PTI_DEPTH24_8] && !r_shadow_shadowmapping.ival)
 				fmt = PTI_DEPTH24_8;
-			else if (sh_config.texfmt[PTI_DEPTH32])
+			else
+#endif
+			if (sh_config.texfmt[PTI_DEPTH32])
 				fmt = PTI_DEPTH32;
 			else
 				fmt = PTI_DEPTH16;
