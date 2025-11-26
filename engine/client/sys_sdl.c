@@ -21,6 +21,25 @@
 	#endif
 #endif
 
+#if defined(__DREAMCAST__)
+#include <kos.h>
+#include <kos/thread.h>
+KOS_INIT_FLAGS(INIT_DEFAULT | INIT_CDROM | INIT_CONTROLLER | INIT_KEYBOARD | INIT_MOUSE | INIT_VMU);
+#define MAIN_STACK_SIZE (32 * 1024)
+static void init_thread_stack(void)
+{
+	kthread_t *current = thd_get_current();
+	if (current) {
+		void *new_stack = malloc(MAIN_STACK_SIZE);
+		if (new_stack) {
+			current->stack = new_stack;
+			current->stack_size = MAIN_STACK_SIZE;
+			current->flags |= THD_OWNS_STACK;
+		}
+	}
+}
+#endif
+
 #if SDL_VERSION_ATLEAST(2,0,0)
 extern SDL_Window *sdlwindow;
 #endif
@@ -1430,6 +1449,10 @@ int QDECL main(int argc, char **argv)
 	quakeparms_t	parms;
 
 	memset(&parms, 0, sizeof(parms));
+
+#ifdef __DREAMCAST__
+	init_thread_stack();
+#endif
 
 #if SDL_VERSION_ATLEAST(3, 0, 0)
 	parms.basedir = SDL_GetCurrentDirectory();
