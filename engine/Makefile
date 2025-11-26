@@ -456,6 +456,7 @@ ifeq ($(FTE_TARGET),dos)
 endif
 
 ifeq ($(FTE_TARGET),kos)
+	LD=kos-cc
 	CC=kos-cc
 	CXX=kos-c++
 	STRIP=kos-strip
