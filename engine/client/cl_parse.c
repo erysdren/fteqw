@@ -9063,7 +9063,9 @@ static qboolean CLNQ_ParseNQPrints(char *s)
 			while(*s == ' ')
 				s++;
 			COM_ParseOut(s, cl.players[cl.nqparseprintplayer].ip, sizeof(cl.players[cl.nqparseprintplayer].ip));
+#ifdef IPLOG
 			IPLog_Add(cl.players[cl.nqparseprintplayer].ip, cl.players[cl.nqparseprintplayer].name);
+#endif
 			if (*cl.players[cl.nqparseprintplayer].ip != '[' && *cl.players[cl.nqparseprintplayer].ip < '0' && *cl.players[cl.nqparseprintplayer].ip > '9')
 				*cl.players[cl.nqparseprintplayer].ip = 0;	//non-numeric addresses are not useful.
 			cl.nqparseprint = CLNQPP_STATUSPLAYER;

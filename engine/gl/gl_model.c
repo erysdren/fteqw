@@ -3367,8 +3367,10 @@ void Mod_Batches_Build(model_t *mod, builddata_t *bd)
 	{
 		if (bd->paintlightmaps)
 			Mod_Batches_AllocLightmaps(mod);
+#ifdef Q3BSPS
 		else
 			Mod_Batches_SplitLightmaps(mod, merge);
+#endif
 		Mod_Batches_BuildModelMeshes(mod, numverts, numindicies, bd->buildfunc, bd, merge);
 	}
 

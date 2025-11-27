@@ -40,7 +40,7 @@ cvar_t r_dodgymiptex = CVARD("r_dodgymiptex", "1", "When enabled, this will forc
 cvar_t r_keepimages = CVARD("r_keepimages", "0", "Retain unused images in memory for slightly faster map loading.\n0: Redundant images will be purged after each map change.\n1: Images will be retained until vid_reload (potentially consuming a lot of ram).");
 cvar_t r_ignoremapprefixes = CVARD("r_ignoremapprefixes", "0",  "Ignores when textures were loaded from map-specific paths.\n0: textures/foo/tex.tga will not be confused with textures/foo/tex.tga.\n1: The same texture might be loaded multiple times over.");
 
-char *r_defaultimageextensions =
+char *r_defaultimageextensions = ""
 #ifdef IMAGEFMT_DDS
 	"dds "	//compressed or something
 #endif
