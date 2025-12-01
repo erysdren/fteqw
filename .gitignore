@@ -1,5 +1,5 @@
 #misc build artifacts
-build
+build*/
 *.o
 *.o.d
 engine/debug/
