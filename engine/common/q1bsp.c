@@ -1362,6 +1362,48 @@ int Q1BSP_HullPointContents(hull_t *hull, const vec3_t p)
 	return Q1BSP_TranslateContents(Q1_HullPointContents(hull, hull->firstclipnode, p));
 }
 
+#ifndef Q3BSPS
+// HACK: copied from gl_q2bsp.c
+static int	PlaneTypeForNormal ( vec3_t normal )
+{
+	vec_t	ax, ay, az;
+
+// NOTE: should these have an epsilon around 1.0?
+	if ( normal[0] >= 1.0)
+		return PLANE_X;
+	if ( normal[1] >= 1.0 )
+		return PLANE_Y;
+	if ( normal[2] >= 1.0 )
+		return PLANE_Z;
+
+	ax = fabs( normal[0] );
+	ay = fabs( normal[1] );
+	az = fabs( normal[2] );
+
+	if ( ax >= ay && ax >= az )
+		return PLANE_ANYX;
+	if ( ay >= ax && ay >= az )
+		return PLANE_ANYY;
+	return PLANE_ANYZ;
+}
+
+void CategorizePlane ( mplane_t *plane )
+{
+	int i;
+
+	plane->signbits = 0;
+	plane->type = PLANE_ANYZ;
+	for (i = 0; i < 3; i++)
+	{
+		if (plane->normal[i] < 0)
+			plane->signbits |= 1<<i;
+		if (plane->normal[i] == 1.0f)
+			plane->type = i;
+	}
+	plane->type = PlaneTypeForNormal(plane->normal);
+}
+#endif
+
 #ifdef Q1BSPS
 unsigned int Q1BSP_PointContents(model_t *model, const vec3_t axis[3], const vec3_t point)
 {

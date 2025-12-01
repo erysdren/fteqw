@@ -1413,7 +1413,9 @@ static qboolean GL_CheckExtensions (void *(*getglfunction) (char *name))
 	}
 
 	Cvar_LockUnsupportedRendererCvar(&r_halfrate, "0");
+#ifdef RTLIGHTS
 	Cvar_LockUnsupportedRendererCvar(&r_shadow_raytrace, "0");
+#endif
 	return true;	//all okay.
 }
 

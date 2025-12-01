@@ -2932,10 +2932,12 @@ static void Shader_BEMode(parsestate_t *ps, const char **ptr)
 		//shorthand for rtlights
 		for (mode = 0; mode < LSHADER_MODES; mode++)
 		{
+#ifdef RTLIGHTS
 			if ((mode & LSHADER_RAYQUERY) && !r_shadow_raytrace.ival)
 				continue;	//no. just no.
 			if ((mode & LSHADER_SMAP) && r_shadow_raytrace.ival)
 				continue;	//don't waste time.
+#endif
 			if ((mode & LSHADER_CUBE) && (mode & (LSHADER_SPOT|LSHADER_ORTHO)))
 				continue;	//cube projections don't make sense when the light isn't projecting a cube
 			if ((mode & LSHADER_ORTHO) && (mode & LSHADER_SPOT))

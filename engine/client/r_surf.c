@@ -2323,10 +2323,12 @@ void Surf_GenBrushBatches(batch_t **batches, entity_t *ent)
 					continue;
 				if (!(cl_dlights[k].flags & LFLAG_LIGHTMAP))
 					continue;
+#ifdef RTLIGHTS
 				if ((cl_dlights[k].flags & LFLAG_NORMALMODE) && r_shadow_realtime_dlight.ival)
 					continue;
 				if ((cl_dlights[k].flags & LFLAG_REALTIMEMODE) && r_shadow_realtime_world.ival)
 					continue;
+#endif
 				model->funcs.MarkLights (&cl_dlights[k], (dlightbitmask_t)1<<k, model->rootnode);
 			}
 		}

@@ -753,10 +753,12 @@ void R_PushDlights (void)
 	{
 		if (!l->radius || !(l->flags & LFLAG_LIGHTMAP))
 			continue;
+#ifdef RTLIGHTS
 		if ((l->flags & LFLAG_NORMALMODE) && r_shadow_realtime_dlight.ival)
 			continue;	//don't draw both. its redundant and a waste of cpu.
 		if ((l->flags & LFLAG_REALTIMEMODE) && r_shadow_realtime_world.ival)
 			continue;	//also don't draw both.
+#endif
 		currentmodel->funcs.MarkLights( l, (dlightbitmask_t)1u<<i, currentmodel->nodes );
 	}
 }
