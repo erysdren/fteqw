@@ -1,5 +1,6 @@
 #misc build artifacts
 build*/
+game/
 *.o
 *.o.d
 engine/debug/

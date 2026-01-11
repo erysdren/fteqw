@@ -25,3 +25,8 @@ add_executable(fteqtv
 )
 target_link_libraries(fteqtv PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
 target_include_directories(fteqtv PRIVATE ${FTE_ENGINE_CLIENT_DIR})
+set_target_properties(fteqtv
+	PROPERTIES
+		LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
+		RUNTIME_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
+)
