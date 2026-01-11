@@ -5,6 +5,7 @@ project(fteqw-ng
 	LANGUAGES C CXX
 )
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+include(fte_add_tool)
 
 find_package(Math)
 find_package(ZLIB REQUIRED)
