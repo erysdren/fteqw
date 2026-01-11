@@ -32,7 +32,7 @@ This file is the core of an assembler/linker to generate q3-compatable qvm files
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "../engine/qclib/hash.h"
+#include "hash.h"
 
 
 //from qfiles.h

@@ -19,5 +19,9 @@ add_executable(fteqtv
 	${PROJECT_SOURCE_DIR}/pmove.c
 	${PROJECT_SOURCE_DIR}/menu.c
 	${PROJECT_SOURCE_DIR}/httpsv.c
-	${FTE_ENGINE_ROOT}/common/sha1.c
+	${PROJECT_SOURCE_DIR}/relay.c
+	${FTE_ENGINE_COMMON_DIR}/sha1.c
+	${FTE_ENGINE_COMMON_DIR}/md5.c
 )
+target_link_libraries(fteqtv PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
+target_include_directories(fteqtv PRIVATE ${FTE_ENGINE_CLIENT_DIR})
