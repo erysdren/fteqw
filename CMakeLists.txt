@@ -6,8 +6,12 @@ project(fteqw-ng
 )
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+# external dependencies
+
 find_package(Math)
 find_package(ZLIB REQUIRED)
+
+# options
 
 include(CMakeDependentOption)
 
@@ -16,6 +20,19 @@ cmake_dependent_option(FTE_TOOL_QTV "Build fteqtv" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_IQM "Build iqmtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_ASM "Build q3asm2" ON FTE_TOOLS OFF)
+
+# vars
+
+if(NOT DEFINED CMAKE_SYSTEM_PROCESSOR)
+	set(FTE_SYSTEM_PROCESSOR "unknown")
+else()
+	string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} FTE_SYSTEM_PROCESSOR)
+endif()
+if(WIN32 OR MSVC OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	set(FTE_EXECUTABLE_SUFFIX "_${FTE_SYSTEM_PROCESSOR}.exe")
+else()
+	set(FTE_EXECUTABLE_SUFFIX ".${FTE_SYSTEM_PROCESSOR}")
+endif()
 
 set(FTE_ROOT_DIR ${PROJECT_SOURCE_DIR})
 set(FTE_ENGINE_ROOT_DIR ${FTE_ROOT_DIR}/engine)
@@ -27,5 +44,7 @@ set(FTE_ENGINE_GL_DIR ${FTE_ENGINE_ROOT_DIR}/gl)
 set(FTE_ENGINE_VK_DIR ${FTE_ENGINE_ROOT_DIR}/vk)
 set(FTE_PLUGINS_ROOT_DIR ${FTE_ROOT_DIR}/plugins)
 set(FTE_TOOLS_ROOT_DIR ${FTE_ROOT_DIR}/tools)
+
+# includes
 
 include(fte_tools)

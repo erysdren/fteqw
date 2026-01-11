@@ -9,6 +9,7 @@ function(fte_add_tool name)
 		PROPERTIES
 			LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
 			RUNTIME_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
+			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
 	)
 endfunction()
 
