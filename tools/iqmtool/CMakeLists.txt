@@ -1,2 +1,5 @@
 project(iqmtool)
+if(NOT FTE_TOOL_IQM)
+	return()
+endif()
 add_executable(iqmtool ${PROJECT_SOURCE_DIR}/iqm.cpp)

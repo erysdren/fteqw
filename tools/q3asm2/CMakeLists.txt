@@ -1,2 +1,5 @@
 project(q3asm2)
+if(NOT FTE_TOOL_ASM)
+	return()
+endif()
 add_executable(q3asm2 ${PROJECT_SOURCE_DIR}/q3asm2.c)

@@ -1,4 +1,7 @@
 project(fteqtv)
+if(NOT FTE_TOOL_QTV)
+	return()
+endif()
 add_executable(fteqtv
 	${PROJECT_SOURCE_DIR}/libqtvc/glibc_sucks.c
 	${PROJECT_SOURCE_DIR}/libqtvc/msvc_sucks.c
@@ -16,5 +19,5 @@ add_executable(fteqtv
 	${PROJECT_SOURCE_DIR}/pmove.c
 	${PROJECT_SOURCE_DIR}/menu.c
 	${PROJECT_SOURCE_DIR}/httpsv.c
-	${PROJECT_SOURCE_DIR}/sha1.c
+	${FTE_ENGINE_ROOT}/common/sha1.c
 )

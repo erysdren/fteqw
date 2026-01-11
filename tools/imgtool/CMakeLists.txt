@@ -1,2 +1,5 @@
 project(imgtool)
+if(NOT FTE_TOOL_IMG)
+	return()
+endif()
 add_executable(imgtool ${PROJECT_SOURCE_DIR}/imgtool.c)
