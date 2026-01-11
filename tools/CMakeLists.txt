@@ -1,8 +1,0 @@
-project(tools)
-if(NOT FTE_TOOLS)
-	return()
-endif()
-add_subdirectory(fteqtv)
-add_subdirectory(imgtool)
-add_subdirectory(iqmtool)
-add_subdirectory(q3asm2)

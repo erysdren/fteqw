@@ -5,7 +5,6 @@ project(fteqw-ng
 	LANGUAGES C CXX
 )
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-include(fte_add_tool)
 
 find_package(Math)
 find_package(ZLIB REQUIRED)
@@ -26,5 +25,7 @@ set(FTE_ENGINE_CLIENT_DIR ${FTE_ENGINE_ROOT_DIR}/client)
 set(FTE_ENGINE_SERVER_DIR ${FTE_ENGINE_ROOT_DIR}/server)
 set(FTE_ENGINE_GL_DIR ${FTE_ENGINE_ROOT_DIR}/gl)
 set(FTE_ENGINE_VK_DIR ${FTE_ENGINE_ROOT_DIR}/vk)
+set(FTE_PLUGINS_ROOT_DIR ${FTE_ROOT_DIR}/plugins)
+set(FTE_TOOLS_ROOT_DIR ${FTE_ROOT_DIR}/tools)
 
-add_subdirectory(tools)
+include(fte_tools)
