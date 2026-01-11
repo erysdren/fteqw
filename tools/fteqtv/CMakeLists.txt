@@ -1,0 +1,20 @@
+project(fteqtv)
+add_executable(fteqtv
+	${PROJECT_SOURCE_DIR}/libqtvc/glibc_sucks.c
+	${PROJECT_SOURCE_DIR}/libqtvc/msvc_sucks.c
+	${PROJECT_SOURCE_DIR}/netchan.c
+	${PROJECT_SOURCE_DIR}/parse.c
+	${PROJECT_SOURCE_DIR}/msg.c
+	${PROJECT_SOURCE_DIR}/qw.c
+	${PROJECT_SOURCE_DIR}/source.c
+	${PROJECT_SOURCE_DIR}/bsp.c
+	${PROJECT_SOURCE_DIR}/rcon.c
+	${PROJECT_SOURCE_DIR}/mdfour.c
+	${PROJECT_SOURCE_DIR}/crc.c
+	${PROJECT_SOURCE_DIR}/control.c
+	${PROJECT_SOURCE_DIR}/forward.c
+	${PROJECT_SOURCE_DIR}/pmove.c
+	${PROJECT_SOURCE_DIR}/menu.c
+	${PROJECT_SOURCE_DIR}/httpsv.c
+	${PROJECT_SOURCE_DIR}/sha1.c
+)

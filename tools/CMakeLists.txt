@@ -1,0 +1,5 @@
+project(tools)
+add_subdirectory(fteqtv)
+add_subdirectory(imgtool)
+add_subdirectory(iqmtool)
+add_subdirectory(q3asm2)
