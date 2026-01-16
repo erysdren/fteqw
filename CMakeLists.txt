@@ -32,6 +32,7 @@ cmake_dependent_option(FTE_PLUGIN_COD "Build CoD formats plugin" ON FTE_PLUGINS 
 include(fte_revision)
 include(fte_system)
 include(fte_directories)
+include(fte_config)
 
 # components
 
