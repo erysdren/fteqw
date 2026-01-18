@@ -5,6 +5,8 @@ endif()
 function(fte_add_tool name)
 	cmake_parse_arguments(PARSE_ARGV 1 ARG "" "" "SOURCES")
 	add_executable(${name} ${ARG_SOURCES})
+	target_compile_options(${name} PRIVATE ${FTE_COMMON_OPTIONS})
+	target_compile_definitions(${name} PRIVATE ${FTE_COMMON_DEFINITIONS})
 	set_target_properties(${name}
 		PROPERTIES
 			LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
