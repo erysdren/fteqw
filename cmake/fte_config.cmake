@@ -182,5 +182,5 @@ block(SCOPE_FOR VARIABLES)
 	set(QUAKESPYAPI FALSE) #define this if you want the engine to be usable via gamespy/quakespy, which has been dead for a long time now. forces the client to use a single port for all outgoing connections, which hurts reconnects.
 
 	# configure the options header
-	configure_file(${FTE_ROOT_DIR}/cmake/config.h.in ${FTE_ENGINE_COMMON_DIR}/config_generated.h @ONLY)
+	configure_file(${FTE_ROOT_DIR}/cmake/config.h.in ${FTE_ENGINE_COMMON_DIR}/config.h @ONLY)
 endblock()
