@@ -16,4 +16,5 @@ function(fte_add_plugin name)
 	)
 endfunction()
 
+include(plugins/bullet)
 include(plugins/cod)
