@@ -183,4 +183,5 @@ block(SCOPE_FOR VARIABLES)
 
 	# configure the options header
 	configure_file(${FTE_ROOT_DIR}/cmake/config.h.in ${FTE_ENGINE_COMMON_DIR}/config.h @ONLY)
+	string(APPEND FTE_COMMON_DEFINITIONS " CONFIG_FILE_NAME=${FTE_ENGINE_COMMON_DIR}/config.h")
 endblock()
