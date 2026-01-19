@@ -28,6 +28,11 @@ option(FTE_PLUGINS "Build plugins" ON)
 cmake_dependent_option(FTE_PLUGIN_COD "Build CoD formats plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_BULLET "Build Bullet physics plugin" ON "FTE_PLUGINS;BULLET_FOUND" OFF)
 
+option(FTE_ENGINE "Build engine" ON)
+cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGINE OFF)
+cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGINE OFF)
+cmake_dependent_option(FTE_ENGINE_CLIENT "Build client-only engine" ON FTE_ENGINE OFF)
+
 # compile options
 
 set(FTE_COMMON_OPTIONS "")
@@ -44,3 +49,4 @@ include(fte_config)
 
 include(fte_tools)
 include(fte_plugins)
+include(fte_engine)
