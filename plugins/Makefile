@@ -315,7 +315,7 @@ $(PLUG_PREFIX)bullet$(PLUG_NATIVE_EXT): bullet/bulletplug.cpp plugin.c $(BULLET_
 
 ######################################
 #jolt physics
-JOLT_VER=5.3.0
+JOLT_VER=5.5.0
 JOLT_URL=https://github.com/jrouwe/JoltPhysics/archive/refs/tags/v$(JOLT_VER).tar.gz
 JOLT_BASE=$(ARCHLIBS)/
 $(OUT_DIR)/../JoltPhysics-$(JOLT_VER).tar.gz:
