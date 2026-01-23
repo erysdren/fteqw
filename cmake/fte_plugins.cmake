@@ -18,3 +18,4 @@ endfunction()
 
 include(plugins/bullet)
 include(plugins/cod)
+include(plugins/hl2)
