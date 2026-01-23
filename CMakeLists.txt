@@ -1100,7 +1100,7 @@ FILE(STRINGS "${FTE_BUILD_CONFIG}" JOLT_INTERNAL REGEX "^#define[\t ]+USE_INTERN
 IF(JOLT_INTERNAL)
 	# FIXME don't duplicate this
 	include(FetchContent)
-	FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.3.0" SOURCE_SUBDIR "Build")
+	FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.5.0" SOURCE_SUBDIR "Build")
 	FetchContent_MakeAvailable(JoltPhysics)
 	SET(FTE_COMMON_FILES ${FTE_COMMON_FILES} plugins/jolt/jolt.cpp)
 	INCLUDE_DIRECTORIES( ${JoltPhysics_SOURCE_DIR}/.. )

@@ -98,7 +98,7 @@ SPEEXVER=1.2.0
 SPEEXDSPVER=1.2.0
 FREETYPEVER=2.10.1
 BULLETVER=2.87
-JOLTVER=5.3.0
+JOLTVER=5.5.0
 OPENSSLVER=3.0.1
 
 #cygwin's make's paths confuses non-cygwin things
