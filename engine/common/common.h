@@ -440,7 +440,7 @@ void QDECL Q_strncpyz(char*d, const char*s, int n);
 
 /*replacement functions which do not care for locale in text formatting ('C' locale), or are non-standard*/
 char *Q_strcasestr(const char *haystack, const char *needle);
-#ifndef IQMTOOL
+#if !defined(IQMTOOL) && !defined(WEBSVONLY) && !defined(FTEPLUGIN)
 int Q_strncasecmp (const char *s1, const char *s2, int n);
 int Q_strcasecmp (const char *s1, const char *s2);
 #endif

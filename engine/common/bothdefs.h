@@ -866,7 +866,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 	#endif
 #endif
 
-#if defined(IQMTOOL)
+#if defined(IQMTOOL) || defined(WEBSVONLY) || defined(FTEPLUGIN)
 	#ifdef _WIN32
 		//Windows-specific...
 		#define Q_strcasecmp _stricmp
