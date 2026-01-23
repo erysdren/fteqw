@@ -1111,7 +1111,7 @@ ELSE()
 	IF(FTE_PLUG_JOLT)
 		# FIXME don't duplicate this
 		include(FetchContent)
-		FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.3.0" SOURCE_SUBDIR "Build")
+		FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.5.0" SOURCE_SUBDIR "Build")
 		FetchContent_MakeAvailable(JoltPhysics)
 		ADD_LIBRARY(plug_jolt MODULE
 			plugins/plugin.c
