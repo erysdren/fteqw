@@ -1230,7 +1230,7 @@ ifneq (,$(findstring SDL3,$(FTE_TARGET))$(findstring sdl3,$(FTE_TARGET)))
 
     GL_CFLAGS=-DFTE_SDL3 $(GLCFLAGS) -DMULTITHREAD $(CLIENTLIBFLAGS)
     VK_CFLAGS=-DFTE_SDL3 $(VKCFLAGS) -DMULTITHREAD $(CLIENTLIBFLAGS)
-    M_CFLAGS=-DFTE_SDL3 $(VKCFLAGS) $(GLCFLAGS) -DMULTITHREAD $(CLIENTLIBFLAGS)
+    M_CFLAGS=-DFTE_SDL3 $(SWCFLAGS) $(VKCFLAGS) $(GLCFLAGS) -DMULTITHREAD $(CLIENTLIBFLAGS)
     SV_CFLAGS=-DFTE_SDL3 -DMULTITHREAD $(SDL3_CFLAGS) $(SERVER_ONLY_CFLAGS)
     ifeq ($(BITS),32)	#we want ofs_t to actually be 64bit.
         CL_CFLAGS+=-D_LARGEFILE64_SOURCE
@@ -1251,7 +1251,7 @@ ifneq (,$(findstring SDL3,$(FTE_TARGET))$(findstring sdl3,$(FTE_TARGET)))
 
     GLCL_OBJS=$(GL_OBJS) $(D3DGL_OBJS) $(GLQUAKE_OBJS) gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o
     VKCL_OBJS=$(VKQUAKE_OBJS) $(D3DGL_OBJS) gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o
-    MCL_OBJS =$(D3DGL_OBJS) $(GLQUAKE_OBJS) $(SOFTWARE_OBJS) gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o
+    MCL_OBJS =$(D3DGL_OBJS) $(GLQUAKE_OBJS) $(SOFTWARE_OBJS) sw_vidsdl.o gl_vidsdl.o snd_sdl.o cd_sdl.o sys_sdl.o in_sdl.o
     SV_OBJS  =$(COMMON_OBJS) $(SERVER_OBJS) $(PROGS_OBJS) $(SERVERONLY_OBJS)
 
     GL_EXE_NAME   =../$(EXE_NAME)-gl$(FTE_FULLTARGET)$(EXEPOSTFIX)

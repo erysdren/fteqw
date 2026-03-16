@@ -1,7 +1,11 @@
 #include "quakedef.h"
 #ifdef SWQUAKE
 #include "sw.h"
+#ifdef FTE_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -32,15 +36,33 @@ qboolean SW_VID_Init(rendererstate_t *info, unsigned char *palette)
 	if (!depthbuffer)
 		return false;
 
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	window = SDL_CreateWindow(NULL, vid.pixelwidth, vid.pixelheight, SDL_WINDOW_RESIZABLE);
+#else
 	window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, vid.pixelwidth, vid.pixelheight, SDL_WINDOW_RESIZABLE);
+#endif
+
 	SDL_SetWindowMinimumSize(window, vid.pixelwidth, vid.pixelheight);
+
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	renderer = SDL_CreateRenderer(window, NULL);
+	SDL_SetRenderLogicalPresentation(renderer, vid.pixelwidth, vid.pixelheight, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+#else
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(renderer, vid.pixelwidth, vid.pixelheight);
+#endif
+
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
+
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	screen = SDL_CreateSurfaceFrom(vid.pixelwidth, vid.pixelheight, SDL_PIXELFORMAT_ARGB8888, NULL, vid.pixelwidth*4);
+	backbuffersurf = SDL_CreateSurfaceFrom(vid.pixelwidth, vid.pixelheight, SDL_PIXELFORMAT_ARGB8888, backbuffer, vid.pixelwidth*4);
+#else
 	screen = SDL_CreateRGBSurfaceWithFormatFrom(NULL, vid.pixelwidth, vid.pixelheight, 0, 0, SDL_PIXELFORMAT_ARGB8888);
 	backbuffersurf = SDL_CreateRGBSurfaceWithFormatFrom(backbuffer, vid.pixelwidth, vid.pixelheight, 0, vid.pixelwidth*4, SDL_PIXELFORMAT_ARGB8888);
+#endif
 	texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, vid.pixelwidth, vid.pixelheight);
 
 	return true;
@@ -53,11 +75,19 @@ void SW_VID_DeInit(void)
 	BZ_Free(depthbuffer);
 	depthbuffer = NULL;
 
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	SDL_DestroySurface(screen);
+	screen = NULL;
+
+	SDL_DestroySurface(backbuffersurf);
+	backbuffersurf = NULL;
+#else
 	SDL_FreeSurface(screen);
 	screen = NULL;
 
 	SDL_FreeSurface(backbuffersurf);
 	backbuffersurf = NULL;
+#endif
 
 	SDL_DestroyTexture(texture);
 	texture = NULL;
@@ -93,16 +123,31 @@ void SW_VID_SetWindowCaption(const char *msg)
 }
 void SW_VID_SwapBuffers(void)
 {
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	if (SDL_LockTexture(texture, NULL, &screen->pixels, &screen->pitch))
+	{
+		SDL_Rect r = {0, 0, vid.pixelwidth, vid.pixelheight};
+		SDL_BlitSurface(backbuffersurf, &r, screen, &r);
+		SDL_UnlockTexture(texture);
+	}
+#else
 	if (SDL_LockTexture(texture, NULL, &screen->pixels, &screen->pitch) == 0)
 	{
 		SDL_Rect r = {0, 0, vid.pixelwidth, vid.pixelheight};
 		SDL_LowerBlit(backbuffersurf, &r, screen, &r);
 		SDL_UnlockTexture(texture);
 	}
+#endif
 
+#if SDL_VERSION_ATLEAST(3, 0, 0)
+	SDL_RenderClear(renderer);
+	SDL_RenderTextureRotated(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_VERTICAL);
+	SDL_RenderPresent(renderer);
+#else
 	SDL_RenderClear(renderer);
 	SDL_RenderCopyEx(renderer, texture, NULL, NULL, 0, NULL, SDL_FLIP_VERTICAL);
 	SDL_RenderPresent(renderer);
+#endif
 
 	framenumber++;
 }
