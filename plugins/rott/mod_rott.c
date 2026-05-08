@@ -1245,7 +1245,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 		for (j = 0; j < prv->areas[i].num_meshes; j++)
 		{
 			int s;
-			uint8_t *vdata = plugfuncs->GMalloc(&mod->memgroup, prv->areas[i].meshes[j].numvertexes * (sizeof(vecV_t) + sizeof(vec2_t) + sizeof(vec3_t) * 3 + sizeof(vec4_t)) + prv->areas[i].meshes[j].numindexes * sizeof(index_t));
+			uint8_t *vdata = plugfuncs->GMalloc(&mod->memgroup, (prv->areas[i].meshes[j].numvertexes * (sizeof(vecV_t) + sizeof(vec2_t) + sizeof(vec3_t) * 3 + sizeof(vec4_t))) + (prv->areas[i].meshes[j].numindexes * sizeof(index_t)));
 
 			prv->areas[i].meshes[j].colors4f_array[0] = (vec4_t *)vdata; vdata += sizeof(vec4_t) * prv->areas[i].meshes[j].numvertexes;
 			prv->areas[i].meshes[j].xyz_array = (vecV_t *)vdata; vdata += sizeof(vecV_t) * prv->areas[i].meshes[j].numvertexes;
@@ -1344,8 +1344,8 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 				{
 					int sidedir, sx, sy;
 					const char *sidetexname = get_maskwall_side_texture(neighbors[i]);
-					if (sidetexname)
-						texname = sidetexname;
+					if (!sidetexname)
+						continue;
 
 					switch (i)
 					{
@@ -1363,7 +1363,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 						case SOUTH: sidedir = EAST; break;
 						case WEST: sidedir = SOUTH; break;
 					}
-					s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
+					s = area_surface_for_name(&prv->areas[area], sidetexname) - prv->areas[area].surfaces;
 					mesh = &prv->areas[area].meshes[s];
 					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, sidedir, 0, level_height, i);
 					areameshoffsets[area][s]++;
@@ -1376,7 +1376,7 @@ static qboolean QDECL Mod_LoadROTTModel(model_t *mod, void *buffer, size_t fsize
 						case SOUTH: sidedir = WEST; break;
 						case WEST: sidedir = NORTH; break;
 					}
-					s = area_surface_for_name(&prv->areas[area], texname) - prv->areas[area].surfaces;
+					s = area_surface_for_name(&prv->areas[area], sidetexname) - prv->areas[area].surfaces;
 					mesh = &prv->areas[area].meshes[s];
 					add_mesh_face(mod, mesh, areameshoffsets[area][s], sx, sy, sidedir, 0, level_height, i);
 					areameshoffsets[area][s]++;
