@@ -526,7 +526,7 @@ NATIVE_PLUGINS+=cod
 ######################################
 #for compat with rott's file formats
 $(PLUG_PREFIX)rott$(PLUG_NATIVE_EXT): rott/rott.c rott/fs_rott.c rott/mod_rott.c plugin.c
-	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS)
+	$(CC) $(BASE_CFLAGS) $(CFLAGS) -DFTEPLUGIN -DMULTITHREAD -o $@ -shared $(PLUG_CFLAGS) $^ $(PLUG_DEFFILE) $(PLUG_LDFLAGS) -fsanitize=address
 	$(call EMBEDMETA,rott,$@,ROTT Formats,Provides support for various formats used by Rise of the Triad.)
 NATIVE_PLUGINS+=rott
 ######################################
