@@ -1126,7 +1126,7 @@ static qboolean FS_Manifest_ParseTokens(ftemanifest_t *man)
 				}
 				if (!strncmp(newdir, "steam:", 6))
 				{	//"steam:Subdir/gamedir"
-					char *sl = strchr(newdir+6, '/');
+					char *sl = (char *)strchr(newdir+6, '/');
 					if (!sl)
 						break;	//malformed steam link
 					man->gamepath[i].flags |= GAMEDIR_PRIVATE|GAMEDIR_STEAMGAME;
@@ -2278,14 +2278,14 @@ fail:
 			loc->search->handle->ReadFile(loc->search->handle, loc, targname);
 
 			//properlyish unixify
-			while((s = strchr(targname, '\\')))
+			while((s = (char *)strchr(targname, '\\')))
 				*s = '/';
 			if (*targname == '/')
 				Q_strncpyz(mergedname, targname+1, sizeof(mergedname));
 			else
 			{
 				Q_strncpyz(mergedname, filename, sizeof(mergedname));
-				while((s = strchr(mergedname, '\\')))
+				while((s = (char *)strchr(mergedname, '\\')))
 					*s = '/';
 				b = COM_SkipPath(mergedname);
 				*b = 0;
@@ -3578,7 +3578,7 @@ searchpathfuncs_t *COM_EnumerateFilesPackage (char *matches, const char *package
 		if (!package)
 			return NULL;
 
-		sl = strchr(package, '/');
+		sl = (char *)strchr(package, '/');
 		if (sl)
 		{	//try to open the named package.
 			*sl = 0;
@@ -4430,7 +4430,7 @@ static qboolean FS_FixupFileCase(char *out, size_t outsize, const char *basedir,
 	if (strchr(entry, '/')) for(;;)
 	{
 		parm.match = entry;
-		s = strchr(entry, '/');
+		s = (char *)strchr(entry, '/');
 		if (s)
 		{
 			parm.isdir = true;
@@ -4485,12 +4485,12 @@ static searchpath_t *FS_AddSingleGameDirectory (searchpath_t **oldpaths, const c
 
 	if (!(flags & SPF_PRIVATE))
 	{
-		if ((p = strrchr(dir, '/')) != NULL)
+		if ((p = (char *)strrchr(dir, '/')) != NULL)
 			Q_strncpyz(pubgamedirfile, ++p, sizeof(pubgamedirfile));
 		else
 			Q_strncpyz(pubgamedirfile, dir, sizeof(pubgamedirfile));
 	}
-	if ((p = strrchr(dir, '/')) != NULL)
+	if ((p = (char *)strrchr(dir, '/')) != NULL)
 		Q_strncpyz(gamedirfile, ++p, sizeof(gamedirfile));
 	else
 		Q_strncpyz(gamedirfile, dir, sizeof(gamedirfile));
@@ -6420,7 +6420,7 @@ static ftemanifest_t *FS_GenerateLegacyManifest(int game, const char *basedir)
 		for (cexec = gamemode_info[game].customexec; cexec && cexec[0] == '/' && cexec[1] == '/'; )
 		{
 			char line[256];
-			char *e = strchr(cexec, '\n');
+			char *e = (char *)strchr(cexec, '\n');
 			if (!e)
 				break;
 			Q_strncpyz(line, cexec+2, min(e-(cexec+2)+1, sizeof(line)));
