@@ -87,12 +87,6 @@ void *zlib_handle;
 
 # endif
 
-#ifndef Z_U4
-#define z_crc_t uLongf
-#endif
-
-//#pragma comment(lib, MSVCLIBSPATH "zlib.lib")
-
 #ifdef DYNAMIC_ZLIB
 	static int (ZEXPORT *qinflateEnd) (z_streamp strm) ZSTATIC(inflateEnd);
 	static int (ZEXPORT *qinflate) (z_streamp strm, int flush) ZSTATIC(inflate);
