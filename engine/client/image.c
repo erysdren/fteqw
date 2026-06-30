@@ -304,7 +304,7 @@ static void GenerateXMPData(char *blob, size_t blobsize, int width, int height, 
 		"</x:xmpmeta>"
 		);
 #else
-	blob[blobsize] = 0;
+	blob[0] = 0;
 #endif
 }
 #endif
