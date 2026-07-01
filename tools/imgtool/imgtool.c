@@ -3049,7 +3049,11 @@ showhelp:
 }
 
 #ifdef FTE_SDL
+#ifdef FTE_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL.h>
+#endif
 
 struct sdlwindow_s
 {

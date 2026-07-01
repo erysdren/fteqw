@@ -111,6 +111,84 @@ set(FTE_ENGINE_SERVER_ONLY_SOURCES
 	$<$<BOOL:${UNIX}>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
 )
 
+set(FTE_ENGINE_CLIENT_SOURCES
+	${FTE_ENGINE_CLIENT_DIR}/textedit.c
+	${FTE_ENGINE_CLIENT_DIR}/fragstats.c
+	${FTE_ENGINE_CLIENT_DIR}/zqtp.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_demo.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_ents.c
+	${FTE_ENGINE_CLIENT_DIR}/clq2_ents.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_input.c
+	${FTE_ENGINE_CLIENT_DIR}/in_generic.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_main.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_parse.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_pred.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_tent.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_cam.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_screen.c
+	${FTE_ENGINE_CLIENT_DIR}/pr_clcmd.c
+	${FTE_ENGINE_CLIENT_DIR}/cl_ignore.c
+	${FTE_ENGINE_CLIENT_DIR}/pr_csqc.c
+	${FTE_ENGINE_CLIENT_DIR}/console.c
+	${FTE_ENGINE_CLIENT_DIR}/image.c
+	${FTE_ENGINE_CLIENT_DIR}/keys.c
+	${FTE_ENGINE_CLIENT_DIR}/menu.c
+	${FTE_ENGINE_CLIENT_DIR}/m_master.c
+	${FTE_ENGINE_CLIENT_DIR}/m_multi.c
+	${FTE_ENGINE_CLIENT_DIR}/m_items.c
+	${FTE_ENGINE_CLIENT_DIR}/m_options.c
+	${FTE_ENGINE_CLIENT_DIR}/m_single.c
+	${FTE_ENGINE_CLIENT_DIR}/m_script.c
+	${FTE_ENGINE_CLIENT_DIR}/m_native.c
+	${FTE_ENGINE_CLIENT_DIR}/m_mp3.c
+	${FTE_ENGINE_CLIENT_DIR}/roq_read.c
+	${FTE_ENGINE_CLIENT_DIR}/clq2_cin.c
+	${FTE_ENGINE_CLIENT_DIR}/r_part.c
+	${FTE_ENGINE_CLIENT_DIR}/p_script.c
+	${FTE_ENGINE_CLIENT_DIR}/p_null.c
+	${FTE_ENGINE_CLIENT_DIR}/p_classic.c
+	${FTE_ENGINE_CLIENT_DIR}/r_partset.c
+	${FTE_ENGINE_CLIENT_DIR}/renderer.c
+	${FTE_ENGINE_CLIENT_DIR}/renderque.c
+	${FTE_ENGINE_CLIENT_DIR}/sbar.c
+	${FTE_ENGINE_CLIENT_DIR}/skin.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_al.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_dma.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_mem.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_mix.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_mp3.c
+	${FTE_ENGINE_CLIENT_DIR}/snd_ov.c
+	${FTE_ENGINE_CLIENT_DIR}/valid.c
+	${FTE_ENGINE_CLIENT_DIR}/vid_headless.c
+	${FTE_ENGINE_CLIENT_DIR}/view.c
+	${FTE_ENGINE_CLIENT_DIR}/wad.c
+	${FTE_ENGINE_CLIENT_DIR}/pr_menu.c
+
+	${FTE_ENGINE_HTTP_DIR}/ftpclient.c
+)
+
+set(FTE_ENGINE_CLIENT_ONLY_SOURCES
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_CLIENT_DIR}/snd_sdl.c>
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_CLIENT_DIR}/cd_sdl.c>
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_CLIENT_DIR}/sys_sdl.c>
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_CLIENT_DIR}/in_sdl.c>
+
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_GL_DIR}/gl_vidsdl.c>
+)
+
+set(FTE_ENGINE_CLIENT_D3DGL_SOURCES
+	${FTE_ENGINE_GL_DIR}/gl_font.c
+	${FTE_ENGINE_GL_DIR}/gl_ngraph.c
+	${FTE_ENGINE_GL_DIR}/gl_shader.c
+	${FTE_ENGINE_GL_DIR}/gl_shadow.c
+	${FTE_ENGINE_GL_DIR}/gl_rlight.c
+	${FTE_ENGINE_GL_DIR}/gl_warp.c
+	${FTE_ENGINE_GL_DIR}/ltface.c
+
+	${FTE_ENGINE_CLIENT_DIR}/r_surf.c
+	${FTE_ENGINE_CLIENT_DIR}/r_2d.c
+)
+
 if(FTE_ENGINE_BOTH)
 
 endif()
@@ -135,5 +213,29 @@ if(FTE_ENGINE_SERVER)
 endif()
 
 if(FTE_ENGINE_CLIENT)
-
+	add_executable(fteqw-cl
+		${FTE_ENGINE_COMMON_SOURCES}
+		${FTE_ENGINE_CLIENT_SOURCES}
+		${FTE_ENGINE_PROGS_SOURCES}
+		${FTE_ENGINE_CLIENT_ONLY_SOURCES}
+		${FTE_ENGINE_CLIENT_D3DGL_SOURCES}
+	)
+	target_compile_options(fteqw-cl PRIVATE ${FTE_COMMON_OPTIONS})
+	target_compile_definitions(fteqw-cl PRIVATE CLIENTONLY ${FTE_COMMON_DEFINITIONS})
+	target_include_directories(fteqw-cl PRIVATE ${FTE_ENGINE_ROOT_DIR} ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR} ${FTE_ENGINE_GL_DIR})
+	target_link_libraries(fteqw-cl
+		PRIVATE
+			ZLIB::ZLIB
+			$<TARGET_NAME_IF_EXISTS:Math::Math>
+			$<TARGET_NAME_IF_EXISTS:Freetype::Freetype>
+			$<TARGET_NAME_IF_EXISTS:SDL::SDL>
+			$<TARGET_NAME_IF_EXISTS:SDL2::SDL2>
+			$<TARGET_NAME_IF_EXISTS:SDL3::SDL3>
+	)
+	set_target_properties(fteqw-cl
+		PROPERTIES
+			LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game
+			RUNTIME_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game
+			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
+	)
 endif()

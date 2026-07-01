@@ -2,7 +2,6 @@ if(NOT FTE_PLUGIN_JOLT)
 	return()
 endif()
 
-include(FetchContent)
 FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.5.0" SOURCE_SUBDIR "Build")
 FetchContent_MakeAvailable(JoltPhysics)
 

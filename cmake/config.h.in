@@ -39,7 +39,6 @@
 #cmakedefine RUNTIMELIGHTING		//automatic generation of .lit files
 
 //Extra misc features.
-#cmakedefine CLIENTONLY								//
 #cmakedefine MULTITHREAD							//misc basic multithreading - dsound, downloads, basic stuff that's unlikely to have race conditions.
 #cmakedefine LOADERTHREAD							//worker threads for loading misc stuff. falls back on main thread if not supported.
 #cmakedefine AVAIL_DINPUT							//

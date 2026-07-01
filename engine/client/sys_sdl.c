@@ -1463,7 +1463,7 @@ int QDECL main(int argc, char **argv)
 	if (parms.binarydir)
 		Sys_Printf("Binary is located at \"%s\"\n", parms.binarydir);
 
-#ifdef HAVE_CLIENT
+#ifdef HAVE_SERVER
 	if (COM_CheckParm ("-dedicated"))
 		isDedicated = true;
 	if (isDedicated)    //compleate denial to switch to anything else - many of the client structures are not initialized.
