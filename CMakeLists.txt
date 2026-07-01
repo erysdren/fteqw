@@ -21,8 +21,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 include(CMakeDependentOption)
 
 option(FTE_TOOLS "Build tools" ON)
-cmake_dependent_option(FTE_TOOL_QTV "Build fteqtv" OFF FTE_TOOLS OFF)
-cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" OFF FTE_TOOLS OFF)
+cmake_dependent_option(FTE_TOOL_QTV "Build fteqtv" OFF FTE_TOOLS OFF) # NOTE: seems unfinished
+cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" OFF FTE_TOOLS OFF) # NOTE: currently broken
 cmake_dependent_option(FTE_TOOL_IQM "Build iqmtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_ASM "Build q3asm2" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_QCC "Build fteqcc" ON FTE_TOOLS OFF)
@@ -39,7 +39,7 @@ cmake_dependent_option(FTE_PLUGIN_NARBDROP "Build NarbDrop formats plugin" ON FT
 option(FTE_ENGINE "Build engine" ON)
 cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGINE OFF)
 cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGINE OFF)
-cmake_dependent_option(FTE_ENGINE_CLIENT "Build client-only engine" ON FTE_ENGINE OFF)
+cmake_dependent_option(FTE_ENGINE_CLIENT "Build client-only engine" OFF FTE_ENGINE OFF) # NOTE: currently broken
 
 set(FTE_ENGINE_SDL_VERSION_MAJOR "3" CACHE STRING "Major SDL version to use for engine")
 set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 1 2 3)
