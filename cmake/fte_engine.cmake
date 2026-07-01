@@ -201,9 +201,24 @@ if(FTE_ENGINE_SERVER)
 		${FTE_ENGINE_SERVER_ONLY_SOURCES}
 	)
 	target_compile_options(fteqw-sv PRIVATE ${FTE_COMMON_OPTIONS})
-	target_compile_definitions(fteqw-sv PRIVATE SERVERONLY ${FTE_COMMON_DEFINITIONS})
-	target_include_directories(fteqw-sv PRIVATE ${FTE_ENGINE_ROOT_DIR} ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR} ${FTE_ENGINE_GL_DIR})
-	target_link_libraries(fteqw-sv PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
+	target_compile_definitions(fteqw-sv
+		PRIVATE
+			SERVERONLY
+			${FTE_COMMON_DEFINITIONS}
+	)
+	target_include_directories(fteqw-sv
+		PRIVATE
+			${FTE_ENGINE_ROOT_DIR}
+			${FTE_ENGINE_COMMON_DIR}
+			${FTE_ENGINE_CLIENT_DIR}
+			${FTE_ENGINE_QCLIB_DIR}
+			${FTE_ENGINE_GL_DIR}
+	)
+	target_link_libraries(fteqw-sv
+		PRIVATE
+			ZLIB::ZLIB
+			$<TARGET_NAME_IF_EXISTS:Math::Math>
+	)
 	set_target_properties(fteqw-sv
 		PROPERTIES
 			LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game
@@ -221,8 +236,21 @@ if(FTE_ENGINE_CLIENT)
 		${FTE_ENGINE_CLIENT_D3DGL_SOURCES}
 	)
 	target_compile_options(fteqw-cl PRIVATE ${FTE_COMMON_OPTIONS})
-	target_compile_definitions(fteqw-cl PRIVATE CLIENTONLY ${FTE_COMMON_DEFINITIONS})
-	target_include_directories(fteqw-cl PRIVATE ${FTE_ENGINE_ROOT_DIR} ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR} ${FTE_ENGINE_GL_DIR})
+	target_compile_definitions(fteqw-cl
+		PRIVATE
+			CLIENTONLY
+			${FTE_COMMON_DEFINITIONS}
+			$<$<BOOL:${FTE_ENGINE_USE_SDL}>:FTE_SDL>
+			$<$<BOOL:$<TARGET_EXISTS:SDL3::SDL3>>:FTE_SDL3>
+	)
+	target_include_directories(fteqw-cl
+		PRIVATE
+			${FTE_ENGINE_ROOT_DIR}
+			${FTE_ENGINE_COMMON_DIR}
+			${FTE_ENGINE_CLIENT_DIR}
+			${FTE_ENGINE_QCLIB_DIR}
+			${FTE_ENGINE_GL_DIR}
+	)
 	target_link_libraries(fteqw-cl
 		PRIVATE
 			ZLIB::ZLIB
