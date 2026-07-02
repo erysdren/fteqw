@@ -218,6 +218,12 @@ set(FTE_ENGINE_CLIENT_D3D_SOURCES
 	${FTE_ENGINE_D3D_DIR}/vid_d3d11.c
 )
 
+set(FTE_ENGINE_CLIENT_SW_SOURCES
+	${FTE_ENGINE_SW_DIR}/sw_rast.c
+	${FTE_ENGINE_SW_DIR}/sw_backend.c
+	${FTE_ENGINE_SW_DIR}/sw_image.c
+)
+
 if(FTE_ENGINE_BOTH)
 	add_executable(fteqw
 		${FTE_ENGINE_COMMON_SOURCES}
@@ -229,6 +235,7 @@ if(FTE_ENGINE_BOTH)
 		${FTE_ENGINE_CLIENT_GL_SOURCES}
 		${FTE_ENGINE_CLIENT_D3DGL_SOURCES}
 		${FTE_ENGINE_CLIENT_D3D_SOURCES}
+		${FTE_ENGINE_CLIENT_SW_SOURCES}
 	)
 	target_compile_options(fteqw PRIVATE ${FTE_COMMON_OPTIONS})
 	target_compile_definitions(fteqw
