@@ -46,3 +46,6 @@ engine/droid/project.properties
 
 # Flatpak build artifacts
 .flatpak-builder
+
+# cmake user presets
+CMakeUserPresets.json
