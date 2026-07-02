@@ -149,7 +149,6 @@ set(AVAIL_DSOUND TRUE CACHE STRING "") #
 set(HAVE_MIXER TRUE CACHE STRING "") #support non-openal audio drivers
 
 # Audio Formats
-set(AVAIL_OGGVORBIS TRUE CACHE STRING "") #.ogg support
 set(AVAIL_MP3_ACM TRUE CACHE STRING "") #.mp3 support (windows only).
 
 # Other Audio Options

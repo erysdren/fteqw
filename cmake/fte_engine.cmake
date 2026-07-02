@@ -53,6 +53,18 @@ set(FTE_ENGINE_COMMON_SOURCES
 	${FTE_ENGINE_SERVER_DIR}/world.c
 	${FTE_ENGINE_SERVER_DIR}/sv_phys.c
 	${FTE_ENGINE_SERVER_DIR}/sv_move.c
+
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/snd_win.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/snd_directx.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/snd_xaudio.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/snd_wasapi.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/cd_win.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/in_win.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_CLIENT_DIR}/sys_win.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_COMMON_DIR}/sys_win_threads.c>
+
+	$<$<BOOL:${WIN32}>:${FTE_ENGINE_COMMON_DIR}/fs_win32.c>
+	$<$<BOOL:${WIN32}>:${FTE_ENGINE_COMMON_DIR}/net_ssl_winsspi.c>
 )
 
 set(FTE_ENGINE_SERVER_SOURCES
@@ -223,6 +235,8 @@ set(FTE_ENGINE_CLIENT_SW_SOURCES
 	${FTE_ENGINE_SW_DIR}/sw_backend.c
 	${FTE_ENGINE_SW_DIR}/sw_image.c
 	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_SW_DIR}/sw_vidsdl.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_SW_DIR}/sw_vidwin.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${DJGPP}>>:${FTE_ENGINE_SW_DIR}/sw_viddos.c>
 )
 
 if(FTE_ENGINE_BOTH)
@@ -262,12 +276,17 @@ if(FTE_ENGINE_BOTH)
 		PRIVATE
 			ZLIB::ZLIB
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
-			$<TARGET_NAME_IF_EXISTS:Freetype::Freetype>
+			$<TARGET_NAME_IF_EXISTS:freetype>
+			$<TARGET_NAME_IF_EXISTS:Ogg::Ogg>
+			$<TARGET_NAME_IF_EXISTS:vorbis>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},1>:SDL::SDL>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},2>:SDL2::SDL2>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},3>:SDL3::SDL3>
 			$<$<STREQUAL:${FTE_ENGINE_RENDERER},gl>:OpenGL::GL>
 			$<$<STREQUAL:${FTE_ENGINE_RENDERER},vk>:Vulkan::Vulkan>
+			$<$<BOOL:${WIN32}>:ws2_32>
+			$<$<BOOL:${WIN32}>:winmm>
+			$<$<BOOL:${WIN32}>:ole32>
 	)
 	set(CLIENT_NAME "fteqw" CACHE STRING "")
 	set_target_properties(fteqw
