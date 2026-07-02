@@ -16,6 +16,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+cmake_policy(SET CMP0072 NEW)
+
 # options
 
 include(CMakeDependentOption)
@@ -41,8 +43,11 @@ cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGIN
 cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGINE OFF)
 cmake_dependent_option(FTE_ENGINE_CLIENT "Build client-only engine" OFF FTE_ENGINE OFF) # NOTE: currently broken
 
-set(FTE_ENGINE_SDL_VERSION_MAJOR "3" CACHE STRING "Major SDL version to use for engine")
+set(FTE_ENGINE_SDL_VERSION_MAJOR 3 CACHE STRING "Major SDL version to use for engine")
 set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 1 2 3)
+
+set(FTE_ENGINE_RENDERER gl CACHE STRING "Renderer to use for engine")
+set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d sw)
 
 # compile options
 
