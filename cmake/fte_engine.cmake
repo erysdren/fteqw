@@ -222,6 +222,7 @@ set(FTE_ENGINE_CLIENT_SW_SOURCES
 	${FTE_ENGINE_SW_DIR}/sw_rast.c
 	${FTE_ENGINE_SW_DIR}/sw_backend.c
 	${FTE_ENGINE_SW_DIR}/sw_image.c
+	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_SW_DIR}/sw_vidsdl.c>
 )
 
 if(FTE_ENGINE_BOTH)
