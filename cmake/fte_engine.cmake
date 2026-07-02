@@ -288,6 +288,11 @@ if(FTE_ENGINE_BOTH)
 			$<$<BOOL:${WIN32}>:winmm>
 			$<$<BOOL:${WIN32}>:ole32>
 	)
+	target_link_options(fteqw
+		PRIVATE
+			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:-s>
+			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:MinSizeRel>>:-s>
+	)
 	set(CLIENT_NAME "fteqw" CACHE STRING "")
 	set_target_properties(fteqw
 		PROPERTIES
