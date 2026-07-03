@@ -19,6 +19,15 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0135 NEW)
 
+if(MINGW)
+	add_link_options(
+		-static
+		-static-libgcc
+		-static-libstdc++
+		-mcrtdll=msvcrt-os
+	)
+endif()
+
 # options
 
 include(CMakeDependentOption)
