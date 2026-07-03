@@ -38,6 +38,7 @@ cmake_dependent_option(FTE_PLUGIN_BULLET "Build Bullet physics plugin" ON "FTE_P
 cmake_dependent_option(FTE_PLUGIN_HL2 "Build HL2 formats plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_JOLT "Build Jolt physics plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_NARBDROP "Build NarbDrop formats plugin" ON FTE_PLUGINS OFF)
+cmake_dependent_option(FTE_PLUGIN_ROTT "Build ROTT formats plugin" ON FTE_PLUGINS OFF)
 
 option(FTE_ENGINE "Build engine" ON)
 cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGINE OFF)
