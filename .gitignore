@@ -49,3 +49,6 @@ engine/droid/project.properties
 
 # cmake user presets
 CMakeUserPresets.json
+
+# untracked
+untracked/
