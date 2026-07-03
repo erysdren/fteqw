@@ -290,8 +290,7 @@ if(FTE_ENGINE_BOTH)
 	)
 	target_link_options(fteqw
 		PRIVATE
-			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release>>:-s>
-			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:MinSizeRel>>:-s>
+			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-s>
 	)
 	set(CLIENT_NAME "fteqw" CACHE STRING "")
 	set_target_properties(fteqw
