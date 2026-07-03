@@ -28,8 +28,8 @@ set(RUNTIMELIGHTING TRUE CACHE STRING "") #automatic generation of .lit files
 set(MULTITHREAD TRUE CACHE STRING "") #misc basic multithreading - dsound, downloads, basic stuff that's unlikely to have race conditions.
 set(LOADERTHREAD TRUE CACHE STRING "") #worker threads for loading misc stuff. falls back on main thread if not supported.
 set(AVAIL_DINPUT TRUE CACHE STRING "") #
-set(SIDEVIEWS 4) #enable secondary/reverse views.
-set(MAX_SPLITS 4u) #
+set(SIDEVIEWS 4 CACHE STRING "") #enable secondary/reverse views.
+set(MAX_SPLITS 4u CACHE STRING "") #
 set(VERTEXINDEXBYTES 2) #16bit indexes work everywhere but may break some file types, 32bit indexes are optional in gles<=2 and d3d<=9 and take more memory/copying but allow for bigger batches/models. Plugins need to be compiled the same way so this is no longer set per-renderer.
 set(TEXTEDITOR TRUE CACHE STRING "") #my funky text editor! its awesome!
 set(PLUGINS TRUE CACHE STRING "") #support for external plugins (like huds or fancy menus or whatever)
