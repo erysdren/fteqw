@@ -106,11 +106,8 @@
 #cmakedefine IMAGEFMT_PCX			//paletted junk. required for qw player skins, q2 and a few old skyboxes.
 #cmakedefine IMAGEFMT_EXR			//openexr, via Industrial Light & Magic's rgba api, giving half-float data.
 #cmakedefine IMAGEFMT_PVR			//powervr texture, used by various dreamcast games including HL and Q3
-#cmakedefine AVAIL_PNGLIB			//.png image format support (read+screenshots)
-#cmakedefine AVAIL_JPEGLIB			//.jpeg image format support (read+screenshots)
 #cmakedefine AVAIL_STBI				//make use of Sean T. Barrett's lightweight public domain stb_image[_write] single-file-library, to avoid libpng/libjpeg dependancies.
 #cmakedefine PACKAGE_TEXWAD			//quake's image wad support
-#cmakedefine AVAIL_FREETYPE			//for truetype font rendering
 #cmakedefine DECOMPRESS_ETC2		//decompress etc2(core in gles3/gl4.3) if the graphics driver doesn't support it (eg d3d or crappy gpus with vulkan).
 #cmakedefine DECOMPRESS_S3TC		//allows bc1-3 to work even when drivers don't support it. This is probably only an issue on mobile chips. WARNING: not entirely sure if all patents expired yet...
 #cmakedefine DECOMPRESS_RGTC		//bc4+bc5
@@ -163,7 +160,6 @@
 #cmakedefine HAVE_MIXER				//support non-openal audio drivers
 
 // Audio Formats
-#cmakedefine AVAIL_OGGVORBIS		//.ogg support
 #cmakedefine AVAIL_MP3_ACM			//.mp3 support (windows only).
 
 // Other Audio Options

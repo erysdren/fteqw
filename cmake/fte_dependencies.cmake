@@ -4,11 +4,9 @@ include(FetchContent)
 find_package(Math)
 
 if(FTE_VENDOR_DEPENDENCIES)
-	set(ZLIB_USE_STATIC_LIBS ON)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a
-		FIND_PACKAGE_ARGS
 	)
 	FetchContent_MakeAvailable(ZLIB)
 else()
