@@ -92,11 +92,7 @@ set(IMAGEFMT_BMP TRUE CACHE STRING "") #windows bmp. yuck. also includes .ico fo
 set(IMAGEFMT_PCX TRUE CACHE STRING "") #paletted junk. required for qw player skins, q2 and a few old skyboxes.
 set(IMAGEFMT_EXR TRUE CACHE STRING "") #openexr, via Industrial Light & Magic's rgba api, giving half-float data.
 set(IMAGEFMT_PVR TRUE CACHE STRING "") #powervr texture, used by various dreamcast games including HL and Q3
-set(AVAIL_PNGLIB TRUE CACHE STRING "") #.png image format support (read+screenshots)
-set(AVAIL_JPEGLIB TRUE CACHE STRING "") #.jpeg image format support (read+screenshots)
-set(AVAIL_STBI FALSE CACHE STRING "") #make use of Sean T. Barrett's lightweight public domain stb_image[_write] single-file-library, to avoid libpng/libjpeg dependancies.
 set(PACKAGE_TEXWAD TRUE CACHE STRING "") #quake's image wad support
-# set(AVAIL_FREETYPE TRUE CACHE STRING "") #for truetype font rendering
 set(DECOMPRESS_ETC2 TRUE CACHE STRING "") #decompress etc2(core in gles3/gl4.3) if the graphics driver doesn't support it (eg d3d or crappy gpus with vulkan).
 set(DECOMPRESS_S3TC TRUE CACHE STRING "") #allows bc1-3 to work even when drivers don't support it. This is probably only an issue on mobile chips. WARNING: not entirely sure if all patents expired yet...
 set(DECOMPRESS_RGTC TRUE CACHE STRING "") #bc4+bc5
