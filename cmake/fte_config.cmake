@@ -42,7 +42,6 @@ set(PACKAGE_Q1PAK TRUE CACHE STRING "") #also q2
 set(PACKAGE_DOOMWAD FALSE CACHE STRING "") #doom wad support (generates various file names, and adds support for doom's audio, sprites, etc)
 set(AVAIL_XZDEC TRUE CACHE STRING "") #.xz decompression
 set(AVAIL_GZDEC TRUE CACHE STRING "") #.gz decompression
-set(AVAIL_ZLIB TRUE CACHE STRING "") #whether pk3s can be compressed or not.
 set(AVAIL_BZLIB FALSE CACHE STRING "") #whether pk3s can use bz2 compression
 set(PACKAGE_DZIP TRUE CACHE STRING "") #.dzip support for smaller demos (which are actually more like pak files and can store ANY type of file)
 

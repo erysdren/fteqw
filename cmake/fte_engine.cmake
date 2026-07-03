@@ -276,7 +276,7 @@ if(FTE_ENGINE_BOTH)
 	)
 	target_link_libraries(fteqw
 		PRIVATE
-			ZLIB::ZLIBSTATIC
+			$<TARGET_NAME_IF_EXISTS:zlibstatic>
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<TARGET_NAME_IF_EXISTS:freetype>
 			$<TARGET_NAME_IF_EXISTS:Ogg::Ogg>

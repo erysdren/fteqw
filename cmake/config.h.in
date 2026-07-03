@@ -56,7 +56,6 @@
 #cmakedefine PACKAGE_DOOMWAD		//doom wad support (generates various file names, and adds support for doom's audio, sprites, etc)
 #cmakedefine AVAIL_XZDEC			//.xz decompression
 #cmakedefine AVAIL_GZDEC			//.gz decompression
-#cmakedefine AVAIL_ZLIB				//whether pk3s can be compressed or not.
 #cmakedefine AVAIL_BZLIB			//whether pk3s can use bz2 compression
 #cmakedefine PACKAGE_DZIP			//.dzip support for smaller demos (which are actually more like pak files and can store ANY type of file)
 
