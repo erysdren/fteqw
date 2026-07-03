@@ -3301,7 +3301,11 @@ void Mod_Batches_Build(model_t *mod, builddata_t *bd)
 	int merge = 1;
 
 	if (!mod->textures)
+	{	//already built its own batches?
+		if (BE_GenBrushModelVBO && !bd)
+			BE_GenBrushModelVBO(mod);
 		return;
+	}
 
 	if (mod->firstmodelsurface + mod->nummodelsurfaces > mod->numsurfaces)
 		Sys_Error("submodel %s surface range is out of bounds\n", mod->name);
