@@ -7,6 +7,7 @@ if(FTE_VENDOR_DEPENDENCIES)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a
+		EXCLUDE_FROM_ALL
 	)
 	FetchContent_MakeAvailable(ZLIB)
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
@@ -22,6 +23,32 @@ else()
 	endif()
 endif()
 
+if(FTE_PLUGIN_BULLET)
+	if(FTE_VENDOR_DEPENDENCIES)
+		FetchContent_Declare(Bullet
+			URL "https://github.com/bulletphysics/bullet3/archive/refs/tags/2.89.tar.gz"
+			URL_HASH MD5=d239b4800ec30513879834be6fcdc376
+			EXCLUDE_FROM_ALL
+		)
+		set(BUILD_BULLET2_DEMOS OFF CACHE STRING "")
+		set(BUILD_EXTRAS OFF CACHE STRING "")
+		set(BUILD_BULLET3 OFF CACHE STRING "")
+		FetchContent_MakeAvailable(Bullet)
+	else()
+		find_package(Bullet REQUIRED)
+	endif()
+endif()
+
+if(FTE_PLUGIN_JOLT)
+	FetchContent_Declare(JoltPhysics
+		GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics.git"
+		GIT_TAG "v5.5.0"
+		SOURCE_SUBDIR "Build"
+		EXCLUDE_FROM_ALL
+	)
+	FetchContent_MakeAvailable(JoltPhysics)
+endif()
+
 if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 	if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
 		if(FTE_VENDOR_DEPENDENCIES)
@@ -35,6 +62,7 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 			FetchContent_Declare(SDL2
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-2.32.10"
+				EXCLUDE_FROM_ALL
 				FIND_PACKAGE_ARGS
 			)
 			FetchContent_MakeAvailable(SDL2)
@@ -47,6 +75,7 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 			FetchContent_Declare(SDL3
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-3.4.12"
+				EXCLUDE_FROM_ALL
 				FIND_PACKAGE_ARGS
 			)
 			FetchContent_MakeAvailable(SDL3)
@@ -66,6 +95,7 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 		FetchContent_Declare(Freetype
 			URL "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz"
 			URL_HASH MD5=c8333525a49e3caf08f427f1a4b01f35
+			EXCLUDE_FROM_ALL
 		)
 		FetchContent_MakeAvailable(Freetype)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE)
@@ -82,12 +112,14 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 		FetchContent_Declare(Ogg
 			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.5.tar.gz"
 			URL_HASH MD5=3267127fe8d7ba77d3e00cb9d7ad578d
+			EXCLUDE_FROM_ALL
 			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Ogg)
 		FetchContent_Declare(Vorbis
 			URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
 			URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
+			EXCLUDE_FROM_ALL
 			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Vorbis)

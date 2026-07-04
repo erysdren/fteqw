@@ -43,7 +43,7 @@ cmake_dependent_option(FTE_TOOL_HTTP "Build httpserver" ON FTE_TOOLS OFF)
 
 option(FTE_PLUGINS "Build plugins" ON)
 cmake_dependent_option(FTE_PLUGIN_COD "Build CoD formats plugin" ON FTE_PLUGINS OFF)
-cmake_dependent_option(FTE_PLUGIN_BULLET "Build Bullet physics plugin" ON "FTE_PLUGINS;BULLET_FOUND" OFF)
+cmake_dependent_option(FTE_PLUGIN_BULLET "Build Bullet physics plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_HL2 "Build HL2 formats plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_IRC "Build IRC plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_JOLT "Build Jolt physics plugin" ON FTE_PLUGINS OFF)

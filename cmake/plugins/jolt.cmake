@@ -2,9 +2,6 @@ if(NOT FTE_PLUGIN_JOLT)
 	return()
 endif()
 
-FetchContent_Declare(JoltPhysics GIT_REPOSITORY "https://github.com/jrouwe/JoltPhysics" GIT_TAG "v5.5.0" SOURCE_SUBDIR "Build")
-FetchContent_MakeAvailable(JoltPhysics)
-
 fte_add_plugin(fteplug_jolt
 	SOURCES
 		${FTE_PLUGINS_ROOT_DIR}/jolt/jolt.cpp
