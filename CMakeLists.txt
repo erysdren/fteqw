@@ -48,6 +48,7 @@ cmake_dependent_option(FTE_PLUGIN_HL2 "Build HL2 formats plugin" ON FTE_PLUGINS 
 cmake_dependent_option(FTE_PLUGIN_IRC "Build IRC plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_JOLT "Build Jolt physics plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_NARBDROP "Build NarbDrop formats plugin" ON FTE_PLUGINS OFF)
+cmake_dependent_option(FTE_PLUGIN_ODE "Build ODE physics plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_OPENXR "Build OpenXR plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_ROTT "Build ROTT formats plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_WINAMP "Build Winamp plugin" ON "FTE_PLUGINS;WIN32" OFF)

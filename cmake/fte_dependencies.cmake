@@ -49,6 +49,15 @@ if(FTE_PLUGIN_JOLT)
 	FetchContent_MakeAvailable(JoltPhysics)
 endif()
 
+if(FTE_PLUGIN_ODE)
+	FetchContent_Declare(ODE
+		GIT_REPOSITORY "https://bitbucket.org/odedevs/ode.git"
+		GIT_TAG "0.16.6"
+		EXCLUDE_FROM_ALL
+	)
+	FetchContent_MakeAvailable(ODE)
+endif()
+
 if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 	if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
 		if(FTE_VENDOR_DEPENDENCIES)
