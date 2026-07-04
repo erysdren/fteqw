@@ -49,6 +49,7 @@ cmake_dependent_option(FTE_PLUGIN_IRC "Build IRC plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_JOLT "Build Jolt physics plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_NARBDROP "Build NarbDrop formats plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_ROTT "Build ROTT formats plugin" ON FTE_PLUGINS OFF)
+cmake_dependent_option(FTE_PLUGIN_XMPP "Build XMPP plugin" ON FTE_PLUGINS OFF)
 
 option(FTE_ENGINE "Build engine" ON)
 cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGINE OFF)
