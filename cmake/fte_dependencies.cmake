@@ -23,6 +23,19 @@ else()
 	endif()
 endif()
 
+if(FTE_PLUGIN_BOX3D)
+	if(FTE_VENDOR_DEPENDENCIES)
+		FetchContent_Declare(box3d
+			GIT_REPOSITORY "https://github.com/erincatto/box3d.git"
+			GIT_TAG "v0.1.0"
+			EXCLUDE_FROM_ALL
+		)
+		FetchContent_MakeAvailable(box3d)
+	else()
+		find_package(box3d 0.1 REQUIRED)
+	endif()
+endif()
+
 if(FTE_PLUGIN_BULLET)
 	if(FTE_VENDOR_DEPENDENCIES)
 		FetchContent_Declare(Bullet
