@@ -1,5 +1,6 @@
 #include "quakedef.h"
 #ifdef VKQUAKE
+#include <limits.h>
 #include "vkrenderer.h"
 #include "gl_draw.h"
 #include "shader.h"
