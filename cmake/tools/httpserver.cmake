@@ -11,3 +11,7 @@ fte_add_tool(httpserver
 )
 target_include_directories(httpserver PRIVATE ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_HTTP_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR})
 target_compile_definitions(httpserver PRIVATE WEBSERVER WEBSVONLY)
+target_link_libraries(httpserver
+	PRIVATE
+		$<$<BOOL:${WIN32}>:ws2_32>
+)

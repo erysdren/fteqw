@@ -327,11 +327,14 @@ if(FTE_ENGINE_SERVER)
 			${FTE_ENGINE_CLIENT_DIR}
 			${FTE_ENGINE_QCLIB_DIR}
 			${FTE_ENGINE_GL_DIR}
+			${FTE_ENGINE_SERVER_DIR}
 	)
 	target_link_libraries(fteqw-sv
 		PRIVATE
 			ZLIB::ZLIB
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
+			$<$<BOOL:${WIN32}>:ws2_32>
+			$<$<BOOL:${WIN32}>:winmm>
 	)
 	set_target_properties(fteqw-sv
 		PROPERTIES

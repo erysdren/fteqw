@@ -20,6 +20,7 @@ fte_add_tool(ftemaster
 		${FTE_ENGINE_COMMON_DIR}/zone.c
 		${FTE_ENGINE_QCLIB_DIR}/hash.c
 		${FTE_ENGINE_COMMON_DIR}/net_ssl_gnutls.c
+		$<$<BOOL:${WIN32}>:${FTE_ENGINE_COMMON_DIR}/fs_win32.c>
 		$<$<BOOL:${WIN32}>:${FTE_ENGINE_SERVER_DIR}/sv_sys_win.c>
 		$<$<BOOL:${WIN32}>:${FTE_ENGINE_COMMON_DIR}/sys_win_threads.c>
 		$<$<BOOL:${WIN32}>:${FTE_ENGINE_COMMON_DIR}/net_ssl_winsspi.c>
@@ -27,5 +28,11 @@ fte_add_tool(ftemaster
 		$<$<BOOL:${UNIX}>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
 )
 target_include_directories(ftemaster PRIVATE ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_QCLIB_DIR} ${FTE_ENGINE_GL_DIR})
-target_link_libraries(ftemaster PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
 target_compile_definitions(ftemaster PRIVATE MASTERONLY)
+target_link_libraries(ftemaster
+	PRIVATE
+		$<TARGET_NAME_IF_EXISTS:zlibstatic>
+		$<TARGET_NAME_IF_EXISTS:Math::Math>
+		$<$<BOOL:${WIN32}>:ws2_32>
+		$<$<BOOL:${WIN32}>:winmm>
+)
