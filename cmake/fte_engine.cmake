@@ -331,7 +331,7 @@ if(FTE_ENGINE_SERVER)
 	)
 	target_link_libraries(fteqw-sv
 		PRIVATE
-			ZLIB::ZLIB
+			$<TARGET_NAME_IF_EXISTS:zlibstatic>
 			$<TARGET_NAME_IF_EXISTS:Math::Math>
 			$<$<BOOL:${WIN32}>:ws2_32>
 			$<$<BOOL:${WIN32}>:winmm>
