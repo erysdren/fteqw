@@ -27,7 +27,11 @@ set(RUNTIMELIGHTING TRUE CACHE STRING "") #automatic generation of .lit files
 # Extra misc features
 set(MULTITHREAD TRUE CACHE STRING "") #misc basic multithreading - dsound, downloads, basic stuff that's unlikely to have race conditions.
 set(LOADERTHREAD TRUE CACHE STRING "") #worker threads for loading misc stuff. falls back on main thread if not supported.
-set(AVAIL_DINPUT TRUE CACHE STRING "") #
+if(WIN32)
+	set(AVAIL_DINPUT TRUE CACHE STRING "") #
+else()
+	set(AVAIL_DINPUT FALSE CACHE STRING "") #
+endif()
 set(SIDEVIEWS 4 CACHE STRING "") #enable secondary/reverse views.
 set(MAX_SPLITS 4u CACHE STRING "") #
 set(VERTEXINDEXBYTES 2 CACHE STRING "") #16bit indexes work everywhere but may break some file types, 32bit indexes are optional in gles<=2 and d3d<=9 and take more memory/copying but allow for bigger batches/models. Plugins need to be compiled the same way so this is no longer set per-renderer.
@@ -139,8 +143,13 @@ set(PACKAGEMANAGER TRUE CACHE STRING "") #Allows the user to enable/disable/down
 
 # Audio Drivers
 set(AVAIL_OPENAL TRUE CACHE STRING "") #
-set(AVAIL_WASAPI TRUE CACHE STRING "") #windows advanced sound api
-set(AVAIL_DSOUND TRUE CACHE STRING "") #
+if(WIN32)
+	set(AVAIL_WASAPI TRUE CACHE STRING "") #windows advanced sound api
+	set(AVAIL_DSOUND TRUE CACHE STRING "") #
+else()
+	set(AVAIL_WASAPI FALSE CACHE STRING "") #windows advanced sound api
+	set(AVAIL_DSOUND FALSE CACHE STRING "") #
+endif()
 set(HAVE_MIXER TRUE CACHE STRING "") #support non-openal audio drivers
 
 # Audio Formats
