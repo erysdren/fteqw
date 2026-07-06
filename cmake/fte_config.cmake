@@ -74,6 +74,8 @@ set(INTERQUAKEMODELS TRUE CACHE STRING "") #Preferred model format, at least fro
 set(MODELFMT_MDX TRUE CACHE STRING "") #kingpin's format (for hitboxes+geomsets).
 set(MODELFMT_OBJ TRUE CACHE STRING "") #lame mesh-only format that needs far too much processing and even lacks a proper magic identifier too
 set(MODELFMT_GLTF TRUE CACHE STRING "") #khronos 'transmission format'. .gltf or .glb extension. PBR. Version 2 only, for now.
+set(MODELFMT_DNXM FALSE CACHE STRING "") #3d realms duke nukem extended model
+set(MODELFMT_CPJ FALSE CACHE STRING "") #3d realms cannibal project model
 set(RAGDOLL TRUE CACHE STRING "") #ragdoll support. requires RBE support (via a plugin...).
 
 # Image formats
