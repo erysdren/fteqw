@@ -835,6 +835,13 @@ static void Mod_ExportIQM_f(void)
 }
 #endif
 
+#ifdef MODELFMT_CPJ
+extern qboolean Plug_CPJ_Init(void);
+#endif
+#ifdef MODELFMT_DNXM
+extern qboolean Plug_DNXM_Init(void);
+#endif
+
 qboolean Plug_Init(void)
 {
 	filefuncs = plugfuncs->GetEngineInterface(plugfsfuncs_name, sizeof(*filefuncs));
@@ -852,6 +859,12 @@ qboolean Plug_Init(void)
 #endif
 #ifdef GLTFMODELS
 		Plug_GLTF_Init();
+#endif
+#ifdef MODELFMT_CPJ
+		Plug_CPJ_Init();
+#endif
+#ifdef MODELFMT_DNXM
+		Plug_DNXM_Init();
 #endif
 
 #if !defined(SERVERONLY) && defined(SKELETALMODELS)
