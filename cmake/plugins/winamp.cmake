@@ -1,4 +1,4 @@
-if(NOT FTE_PLUGIN_WINAMP)
+if(NOT FTE_PLUGIN_WINAMP OR NOT WIN32)
 	return()
 endif()
 
