@@ -68,7 +68,13 @@ if(FTE_PLUGIN_ODE)
 		GIT_TAG "0.16.6"
 		EXCLUDE_FROM_ALL
 	)
+	set(ODE_DOUBLE_PRECISION OFF CACHE STRING "")
 	FetchContent_MakeAvailable(ODE)
+	target_compile_options(ODE
+		PUBLIC
+			$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU,Clang>>:-Wno-deprecated-enum-enum-conversion>
+			$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU,Clang>>:-Wno-deprecated-enum-float-conversion>
+	)
 endif()
 
 if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
