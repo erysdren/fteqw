@@ -77,6 +77,15 @@ if(FTE_PLUGIN_ODE)
 	)
 endif()
 
+if(FTE_TOOL_HEIGHTMAPCONVERTER)
+	FetchContent_Declare(inih
+		GIT_REPOSITORY "https://github.com/benhoyt/inih.git"
+		GIT_TAG "origin/master"
+		EXCLUDE_FROM_ALL
+	)
+	FetchContent_MakeAvailable(inih)
+endif()
+
 if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 	if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
 		if(FTE_VENDOR_DEPENDENCIES)

@@ -40,6 +40,7 @@ cmake_dependent_option(FTE_TOOL_ASM "Build q3asm2" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_QCC "Build fteqcc" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_MASTER "Build ftemaster" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_HTTP "Build httpserver" ON FTE_TOOLS OFF)
+cmake_dependent_option(FTE_TOOL_HEIGHTMAPCONVERTER "Build heightmapconverter" ON FTE_TOOLS OFF)
 
 option(FTE_PLUGINS "Build plugins" ON)
 cmake_dependent_option(FTE_PLUGIN_BOX3D "Build Box3D physics plugin" OFF FTE_PLUGINS OFF) # NOTE: cant build yet
