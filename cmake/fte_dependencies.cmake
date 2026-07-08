@@ -74,6 +74,7 @@ if(FTE_PLUGIN_ODE)
 		PUBLIC
 			$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU,Clang>>:-Wno-deprecated-enum-enum-conversion>
 			$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:GNU,Clang>>:-Wno-deprecated-enum-float-conversion>
+			$<$<AND:$<COMPILE_LANGUAGE:CXX>,$<CXX_COMPILER_ID:MSVC>>:/wd5055>
 	)
 endif()
 
