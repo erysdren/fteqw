@@ -39,8 +39,12 @@
 #		define strncasecmp strnicmp
 #	endif
 #	if defined(_MSC_VER) && _MSC_VER >= 1900
-#		define Q_vsnprintf vsnprintf
-#		define Q_snprintf snprintf
+#		if !defined(Q_vsnprintf)
+#			define Q_vsnprintf vsnprintf
+#		endif
+#		if !defined(Q_snprintf)
+#			define Q_snprintf snprintf
+#		endif
 #	endif
 #else
 #	define stricmp Q_strcasecmp
@@ -603,8 +607,14 @@ extern plugcorefuncs_t *plugfuncs;
 extern plugcmdfuncs_t *cmdfuncs;
 extern plugcvarfuncs_t *cvarfuncs;
 
+#ifndef Q_snprintf
 #define Q_snprintf (void)Q_snprintfz
+#endif
+
+#ifndef Q_vsnprintf
 #define Q_vsnprintf (void)Q_vsnprintfz
+#endif
+
 #ifdef FTEENGINE
 extern plugcorefuncs_t plugcorefuncs;
 #else
