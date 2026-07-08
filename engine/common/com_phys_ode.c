@@ -72,7 +72,9 @@ static rbeplugfuncs_t *rbefuncs;
 //ODE's headers provide version info only as a string, so we don' know when things are deprecated or not.
 //this then fucks us over when we try using -Werror
 //so until ODE changes its ways, we'll just have to make assumptions and ignore those warnings.
+#ifndef _MSC_VER
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #define ODEVERSION MAKE2VER(0,15)
 #define MAKE2VER(maj,min) (((maj)<<8)|(min))
 
