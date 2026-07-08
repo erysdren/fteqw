@@ -7,6 +7,47 @@
 
 #include "ini.h"
 
+qboolean VARGS Q_snprintfz(char *dest, size_t size, const char *fmt, ...)
+{
+	va_list		argptr;
+	size_t ret;
+
+	va_start (argptr, fmt);
+#ifdef _WIN32
+	//doesn't null terminate.
+	//returns -1 on truncation
+	ret = _vsnprintf (dest, size, fmt, argptr);
+	dest[size-1] = 0;	//shitty paranoia
+#else
+	//always null terminates.
+	//returns length regardless of truncation.
+	ret = vsnprintf (dest, size, fmt, argptr);
+#endif
+	va_end (argptr);
+#ifdef _DEBUG
+	if (ret>=size)
+		Sys_Error("Q_vsnprintfz: Truncation\n");
+#endif
+	//if ret is -1 (windows oversize, or general error) then it'll be treated as unsigned so really long. this makes the following check quite simple.
+	return ret>=size;
+}
+
+void QDECL Q_strncpyz(char *d, const char *s, int n)
+{
+	int i;
+	n--;
+	if (n < 0)
+		return;	//this could be an error
+
+		for (i=0; *s; i++)
+		{
+			if (i == n)
+				break;
+			*d++ = *s++;
+		}
+		*d='\0';
+}
+
 typedef struct config {
 	struct {
 		char path[256];
@@ -75,9 +116,9 @@ static int config_handler(void *user, const char *section, const char *name, con
 	if (Q_strcmp(section, "output") == 0)
 	{
 		if (Q_strcmp(name, "path") == 0)
-			strlcpy(config->output.path, value, sizeof(config->output.path));
+			Q_strncpyz(config->output.path, value, sizeof(config->output.path));
 		else if (Q_strcmp(name, "name") == 0)
-			strlcpy(config->output.name, value, sizeof(config->output.name));
+			Q_strncpyz(config->output.name, value, sizeof(config->output.name));
 		else if (Q_strcmp(name, "xscale") == 0)
 			config->output.xscale = atof(value);
 		else if (Q_strcmp(name, "yscale") == 0)
@@ -85,21 +126,21 @@ static int config_handler(void *user, const char *section, const char *name, con
 		else if (Q_strcmp(name, "fog") == 0)
 			config->output.fog = atof(value);
 		else if (Q_strcmp(name, "sky") == 0)
-			strlcpy(config->output.sky, value, sizeof(config->output.sky));
+			Q_strncpyz(config->output.sky, value, sizeof(config->output.sky));
 		else if (Q_strcmp(name, "message") == 0)
-			strlcpy(config->output.message, value, sizeof(config->output.message));
+			Q_strncpyz(config->output.message, value, sizeof(config->output.message));
 		else if (Q_strcmp(name, "defaultgroundtexture") == 0)
-			strlcpy(config->output.defaultgroundtexture, value, sizeof(config->output.defaultgroundtexture));
+			Q_strncpyz(config->output.defaultgroundtexture, value, sizeof(config->output.defaultgroundtexture));
 		else if (Q_strcmp(name, "defaultgroundheight") == 0)
 			config->output.defaultgroundheight = atof(value);
 		else if (Q_strcmp(name, "defaultwatertexture") == 0)
-			strlcpy(config->output.defaultwatertexture, value, sizeof(config->output.defaultwatertexture));
+			Q_strncpyz(config->output.defaultwatertexture, value, sizeof(config->output.defaultwatertexture));
 		else if (Q_strcmp(name, "defaultwaterheight") == 0)
 			config->output.defaultwaterheight = atof(value);
 		else if (Q_strcmp(name, "segmentsize") == 0)
 			config->output.segmentsize = atoi(value);
 		else if (Q_strcmp(name, "exterior") == 0)
-			strlcpy(config->output.exterior, value, sizeof(config->output.exterior));
+			Q_strncpyz(config->output.exterior, value, sizeof(config->output.exterior));
 		else if (Q_strcmp(name, "playerstartx") == 0)
 			config->output.playerstartx = atof(value);
 		else if (Q_strcmp(name, "playerstarty") == 0)
@@ -114,19 +155,19 @@ static int config_handler(void *user, const char *section, const char *name, con
 	else if (Q_strcmp(section, "input") == 0)
 	{
 		if (Q_strcmp(name, "ground0") == 0)
-			strlcpy(config->input.ground[0], value, sizeof(config->input.ground[0]));
+			Q_strncpyz(config->input.ground[0], value, sizeof(config->input.ground[0]));
 		else if (Q_strcmp(name, "ground1") == 0)
-			strlcpy(config->input.ground[1], value, sizeof(config->input.ground[1]));
+			Q_strncpyz(config->input.ground[1], value, sizeof(config->input.ground[1]));
 		else if (Q_strcmp(name, "ground2") == 0)
-			strlcpy(config->input.ground[2], value, sizeof(config->input.ground[2]));
+			Q_strncpyz(config->input.ground[2], value, sizeof(config->input.ground[2]));
 		else if (Q_strcmp(name, "ground3") == 0)
-			strlcpy(config->input.ground[3], value, sizeof(config->input.ground[3]));
+			Q_strncpyz(config->input.ground[3], value, sizeof(config->input.ground[3]));
 		else if (Q_strcmp(name, "heightmap") == 0)
-			strlcpy(config->input.heightmap, value, sizeof(config->input.heightmap));
+			Q_strncpyz(config->input.heightmap, value, sizeof(config->input.heightmap));
 		else if (Q_strcmp(name, "weightmap") == 0)
-			strlcpy(config->input.weightmap, value, sizeof(config->input.weightmap));
+			Q_strncpyz(config->input.weightmap, value, sizeof(config->input.weightmap));
 		else if (Q_strcmp(name, "lightmap") == 0)
-			strlcpy(config->input.lightmap, value, sizeof(config->input.lightmap));
+			Q_strncpyz(config->input.lightmap, value, sizeof(config->input.lightmap));
 	}
 
 	return 1;
@@ -241,11 +282,11 @@ static void write_block(context_t *ctx, int bx, int by)
 	uint32_t offsets[16][16];
 	FILE *fp;
 
-	snprintf(xbx, sizeof(xbx), "%02x", (uint8_t)bx);
-	snprintf(xby, sizeof(xby), "%02x", (uint8_t)by);
+	Q_snprintfz(xbx, sizeof(xbx), "%02x", (uint8_t)bx);
+	Q_snprintfz(xby, sizeof(xby), "%02x", (uint8_t)by);
 
-	snprintf(filepath, sizeof(filepath), "%s/%s", ctx->config.output.path, ctx->config.output.name);
-	snprintf(filename, sizeof(filename), "%s/%s/block_%s_%s.hms", ctx->config.output.path, ctx->config.output.name, xbx, xby);
+	Q_snprintfz(filepath, sizeof(filepath), "%s/%s", ctx->config.output.path, ctx->config.output.name);
+	Q_snprintfz(filename, sizeof(filename), "%s/%s/block_%s_%s.hms", ctx->config.output.path, ctx->config.output.name, xbx, xby);
 
 	fp = fopen(filename, "wb");
 	if (!fp)
