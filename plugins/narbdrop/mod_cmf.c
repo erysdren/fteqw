@@ -185,7 +185,8 @@ static qboolean QDECL Mod_LoadCMFModel(model_t *mod, void *buffer, size_t fsize)
 		strncpy(classname, bufptr, sizeof(classname));
 		bufptr += strlen(classname) + 1;
 
-		entptr += snprintf(entptr, len_entities - (entptr - entities), "{\"classname\"\"%s\"", classname);
+		Q_snprintfz(entptr, len_entities - (entptr - entities), "{\"classname\"\"%s\"", classname);
+		entptr += strlen(entptr) + 1;
 
 		// read properties
 		num_properties = *(uint32_t *)bufptr; bufptr += 4;
@@ -198,7 +199,8 @@ static qboolean QDECL Mod_LoadCMFModel(model_t *mod, void *buffer, size_t fsize)
 			strncpy(val, bufptr, sizeof(val));
 			bufptr += strlen(val) + 1;
 
-			entptr += snprintf(entptr, len_entities - (entptr - entities), "\"%s\"\"%s\"", key, val);
+			Q_snprintfz(entptr, len_entities - (entptr - entities), "\"%s\"\"%s\"", key, val);
+			entptr += strlen(entptr) + 1;
 		}
 
 		*entptr++ = '}';
