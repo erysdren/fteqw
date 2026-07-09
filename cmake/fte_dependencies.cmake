@@ -101,7 +101,6 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-2.32.10"
 				EXCLUDE_FROM_ALL
-				FIND_PACKAGE_ARGS
 			)
 			FetchContent_MakeAvailable(SDL2)
 		else()
@@ -114,7 +113,6 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-3.4.12"
 				EXCLUDE_FROM_ALL
-				FIND_PACKAGE_ARGS
 			)
 			FetchContent_MakeAvailable(SDL3)
 		else()
@@ -136,7 +134,7 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 			EXCLUDE_FROM_ALL
 		)
 		FetchContent_MakeAvailable(Freetype)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE)
+		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE FREETYPE_STATIC)
 	else()
 		find_package(Freetype)
 		if(Freetype_FOUND)
@@ -148,8 +146,8 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 	endif()
 	if(FTE_VENDOR_DEPENDENCIES)
 		FetchContent_Declare(Ogg
-			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.5.tar.gz"
-			URL_HASH MD5=3267127fe8d7ba77d3e00cb9d7ad578d
+			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
+			URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
 			EXCLUDE_FROM_ALL
 			FIND_PACKAGE_ARGS
 		)
@@ -161,7 +159,7 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Vorbis)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS)
+		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
 	else()
 		find_package(Ogg)
 		find_package(Vorbis)
@@ -175,10 +173,11 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 		FetchContent_Declare(PNG
 			URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
 			URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
+			EXCLUDE_FROM_ALL
 			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(PNG)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB)
+		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB LIBPNG_STATIC)
 	else()
 		find_package(PNG)
 		if(PNG_FOUND)
