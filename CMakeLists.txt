@@ -68,7 +68,7 @@ set(FTE_ENGINE_SDL_VERSION_MAJOR 3 CACHE STRING "Major SDL version to use for en
 set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 0 1 2 3)
 
 set(FTE_ENGINE_RENDERER gl CACHE STRING "Renderer to use for engine")
-set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d sw)
+set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d d3d8 sw)
 
 # compile options
 
