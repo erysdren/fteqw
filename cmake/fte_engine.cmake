@@ -191,6 +191,8 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/sys_linux.c>
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
+
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_GL_DIR}/gl_vidnt.c>
 )
 
 set(FTE_ENGINE_CLIENT_VK_SOURCES
@@ -274,6 +276,7 @@ if(FTE_ENGINE_BOTH)
 			${FTE_ENGINE_ROOT_DIR}
 			${FTE_ENGINE_COMMON_DIR}
 			${FTE_ENGINE_CLIENT_DIR}
+			${FTE_ENGINE_SERVER_DIR}
 			${FTE_ENGINE_QCLIB_DIR}
 			${FTE_ENGINE_GL_DIR}
 	)
@@ -292,6 +295,7 @@ if(FTE_ENGINE_BOTH)
 			$<$<BOOL:${WIN32}>:ws2_32>
 			$<$<BOOL:${WIN32}>:winmm>
 			$<$<BOOL:${WIN32}>:ole32>
+			$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:dxguid>
 	)
 	target_link_options(fteqw
 		PRIVATE
