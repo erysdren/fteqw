@@ -171,5 +171,22 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
 			message(WARNING "Ogg/Vorbis not found")
 		endif()
 	endif()
+	if(FTE_VENDOR_DEPENDENCIES)
+		FetchContent_Declare(PNG
+			URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
+			URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
+			FIND_PACKAGE_ARGS
+		)
+		FetchContent_MakeAvailable(PNG)
+		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB)
+	else()
+		find_package(PNG)
+		if(PNG_FOUND)
+			add_library(png_static ALIAS PNG::PNG)
+			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB)
+		else()
+			message(WARNING "libpng not found, PNG images will not load")
+		endif()
+	endif()
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_STBI)
 endif()
