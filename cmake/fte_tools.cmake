@@ -9,8 +9,8 @@ function(fte_add_tool name)
 	target_compile_definitions(${name} PRIVATE ${FTE_COMMON_DEFINITIONS})
 	set_target_properties(${name}
 		PROPERTIES
-			LIBRARY_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
-			RUNTIME_OUTPUT_DIRECTORY ${FTE_ROOT_DIR}/game/bin
+			LIBRARY_OUTPUT_DIRECTORY ${FTE_INSTALL_PREFIX}/bin
+			RUNTIME_OUTPUT_DIRECTORY ${FTE_INSTALL_PREFIX}/bin
 			SUFFIX ${FTE_EXECUTABLE_SUFFIX}
 	)
 endfunction()
