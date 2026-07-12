@@ -17,4 +17,4 @@ fte_add_tool(fteqcc
 		$<$<BOOL:${WIN32}>:${FTE_ENGINE_QCLIB_DIR}/fteqcc.rc>
 )
 target_include_directories(fteqcc PRIVATE ${FTE_ENGINE_QCLIB_DIR})
-target_link_libraries(fteqcc PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
+target_link_libraries(fteqcc PRIVATE $<TARGET_NAME_IF_EXISTS:zlibstatic> $<TARGET_NAME_IF_EXISTS:Math::Math>)

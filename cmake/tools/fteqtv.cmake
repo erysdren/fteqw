@@ -24,5 +24,5 @@ fte_add_tool(fteqtv
 		${FTE_ENGINE_COMMON_DIR}/sha1.c
 		${FTE_ENGINE_COMMON_DIR}/md5.c
 )
-target_link_libraries(fteqtv PRIVATE ZLIB::ZLIB $<TARGET_NAME_IF_EXISTS:Math::Math>)
+target_link_libraries(fteqtv PRIVATE $<TARGET_NAME_IF_EXISTS:zlibstatic> $<TARGET_NAME_IF_EXISTS:Math::Math>)
 target_include_directories(fteqtv PRIVATE ${FTE_ENGINE_CLIENT_DIR})
