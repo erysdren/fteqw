@@ -38,6 +38,7 @@ cmake_dependent_option(FTE_TOOL_IMG "Build imgtool" OFF FTE_TOOLS OFF) # NOTE: c
 cmake_dependent_option(FTE_TOOL_IQM "Build iqmtool" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_ASM "Build q3asm2" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_QCC "Build fteqcc" ON FTE_TOOLS OFF)
+cmake_dependent_option(FTE_TOOL_QCCGUI "Build fteqccgui" ON "FTE_TOOLS;WIN32" OFF)
 cmake_dependent_option(FTE_TOOL_MASTER "Build ftemaster" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_HTTP "Build httpserver" ON FTE_TOOLS OFF)
 cmake_dependent_option(FTE_TOOL_HEIGHTMAPCONVERTER "Build heightmapconverter" ON FTE_TOOLS OFF)

@@ -12,6 +12,9 @@
 #include "qcc.h"
 #include "gui.h"
 
+#undef AVAIL_PNGLIB
+#undef AVAIL_ZLIB
+
 //#define AVAIL_PNGLIB
 //#define AVAIL_ZLIB
 
