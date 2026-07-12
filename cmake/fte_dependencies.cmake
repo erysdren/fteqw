@@ -69,6 +69,7 @@ if(FTE_PLUGIN_ODE)
 		EXCLUDE_FROM_ALL
 	)
 	set(ODE_DOUBLE_PRECISION OFF CACHE STRING "")
+	set(ODE_WITH_DEMOS OFF CACHE STRING "")
 	FetchContent_MakeAvailable(ODE)
 	target_compile_options(ODE
 		PUBLIC
