@@ -2,7 +2,7 @@ if(NOT FTE_TOOL_QCCGUI)
 	return()
 endif()
 
-fte_add_tool(fteqccgui
+fte_add_tool(fteqccgui WIN32
 	SOURCES
 		${FTE_ENGINE_QCLIB_DIR}/qccgui.c
 		${FTE_ENGINE_QCLIB_DIR}/qccguistuff.c
