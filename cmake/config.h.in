@@ -86,6 +86,7 @@
 #cmakedefine MODELFMT_GLTF			//khronos 'transmission format'. .gltf or .glb extension. PBR. Version 2 only, for now.
 #cmakedefine MODELFMT_DNXM			//3d realms duke nukem extended model
 #cmakedefine MODELFMT_CPJ			//3d realms cannibal project model
+#cmakedefine MODELFMT_GLM			//raven software ghoul 2 model
 #cmakedefine RAGDOLL				//ragdoll support. requires RBE support (via a plugin...).
 
 //Image formats
