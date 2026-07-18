@@ -1,0 +1,44 @@
+if(NOT FTE_PLUGIN_QUAKE3)
+	return()
+endif()
+
+fte_add_plugin(fteplug_quake3
+	SOURCES
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_bspq3.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_cluster.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_debug.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_entity.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_file.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_main.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_move.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_optimize.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_reach.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_routealt.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_route.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_aas_sample.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_char.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_chat.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_gen.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_goal.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_move.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_weap.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ai_weight.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_ea.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/be_interface.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_crc.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_libvar.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_log.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_memory.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_precomp.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_script.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/l_struct.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/botlib/standalone.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/clq3_cg.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/clq3_ui.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/clq3_parse.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/svq3_game.c
+		${FTE_PLUGINS_ROOT_DIR}/quake3/q3common.c
+		${FTE_PLUGINS_ROOT_DIR}/plugin.c
+)
+target_include_directories(fteplug_quake3 PRIVATE ${FTE_PLUGINS_ROOT_DIR} ${FTE_ENGINE_CLIENT_DIR} ${FTE_ENGINE_COMMON_DIR} ${FTE_ENGINE_GL_DIR} ${FTE_ENGINE_QCLIB_DIR})
+target_compile_definitions(fteplug_quake3 PRIVATE MULTITHREAD BOTLIB BOTLIB_STATIC)
