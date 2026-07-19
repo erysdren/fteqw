@@ -74,6 +74,9 @@ set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 0 1 2 3)
 set(FTE_ENGINE_RENDERER gl CACHE STRING "Renderer to use for engine")
 set_property(CACHE FTE_ENGINE_RENDERER PROPERTY STRINGS gl vk d3d d3d8 sw)
 
+set(FTE_ENGINE_CLIENT_NAME "fteqw" CACHE STRING "Name of client binary")
+set(FTE_ENGINE_SERVER_NAME "fteqw-sv" CACHE STRING "Name of server binary")
+
 # compile options
 
 set(FTE_COMMON_OPTIONS "")
