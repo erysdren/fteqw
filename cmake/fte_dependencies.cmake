@@ -3,12 +3,13 @@ include(FetchContent)
 
 find_package(Math)
 
-if(FTE_VENDOR_DEPENDENCIES)
+if(FTE_VENDOR_DEPENDENCIES OR EMSCRIPTEN)
 	FetchContent_Declare(ZLIB
 		URL "https://zlib.net/zlib-1.3.2.tar.gz"
 		URL_HASH MD5=a1e6c958597af3c67d162995a342138a
 		EXCLUDE_FROM_ALL
 	)
+	set(ZLIB_BUILD_SHARED OFF CACHE STRING "")
 	FetchContent_MakeAvailable(ZLIB)
 	list(APPEND FTE_COMMON_DEFINITIONS AVAIL_ZLIB)
 else()
@@ -88,7 +89,7 @@ if(FTE_TOOL_HEIGHTMAPCONVERTER)
 	FetchContent_MakeAvailable(inih)
 endif()
 
-if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT)
+if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 	if(FTE_ENGINE_SDL_VERSION_MAJOR STREQUAL "1")
 		if(FTE_VENDOR_DEPENDENCIES)
 			message(FATAL_ERROR "Vendoring SDL 1.2 is currently unsupported")

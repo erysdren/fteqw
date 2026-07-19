@@ -186,13 +186,18 @@ set(FTE_ENGINE_CLIENT_SOURCES
 	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_CLIENT_DIR}/in_sdl.c>
 	$<$<BOOL:${FTE_ENGINE_USE_SDL}>:${FTE_ENGINE_GL_DIR}/gl_vidsdl.c>
 
-	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_GL_DIR}/gl_vidlinuxglx.c>
-	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/snd_linux.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_GL_DIR}/gl_vidlinuxglx.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_CLIENT_DIR}/snd_linux.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_CLIENT_DIR}/sys_linux.c>
+	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${LINUX}>>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
+
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/cd_null.c>
-	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_CLIENT_DIR}/sys_linux.c>
-	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${UNIX}>>:${FTE_ENGINE_COMMON_DIR}/sys_linux_threads.c>
 
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${WIN32}>>:${FTE_ENGINE_GL_DIR}/gl_vidnt.c>
+
+	$<$<BOOL:${EMSCRIPTEN}>:${FTE_ENGINE_WEB_DIR}/fs_web.c>
+	$<$<BOOL:${EMSCRIPTEN}>:${FTE_ENGINE_WEB_DIR}/gl_vidweb.c>
+	$<$<BOOL:${EMSCRIPTEN}>:${FTE_ENGINE_WEB_DIR}/sys_web.c>
 )
 
 set(FTE_ENGINE_CLIENT_VK_SOURCES
@@ -259,7 +264,13 @@ if(FTE_ENGINE_BOTH)
 		${FTE_ENGINE_CLIENT_D3D_SOURCES}
 		${FTE_ENGINE_CLIENT_SW_SOURCES}
 	)
-	target_compile_options(fteqw PRIVATE ${FTE_COMMON_OPTIONS})
+	target_compile_options(fteqw
+		PRIVATE
+			${FTE_COMMON_OPTIONS}
+			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-O3>
+			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-O0>
+			$<$<AND:$<BOOL:${EMSCRIPTEN}>,$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Debug>>:-gsource-map>
+	)
 	target_compile_definitions(fteqw
 		PRIVATE
 			${FTE_COMMON_DEFINITIONS}
@@ -271,6 +282,9 @@ if(FTE_ENGINE_BOTH)
 			$<$<STREQUAL:${FTE_ENGINE_RENDERER},d3d8>:D3D8QUAKE>
 			$<$<STREQUAL:${FTE_ENGINE_RENDERER},d3d>:D3D9QUAKE>
 			$<$<STREQUAL:${FTE_ENGINE_RENDERER},d3d>:D3D11QUAKE>
+			$<$<BOOL:${EMSCRIPTEN}>:FTE_TARGET_WEB>
+			$<$<BOOL:${EMSCRIPTEN}>:OMIT_QCC>
+			$<$<BOOL:${EMSCRIPTEN}>:GL_STATIC>
 	)
 	target_include_directories(fteqw
 		PRIVATE
@@ -293,8 +307,8 @@ if(FTE_ENGINE_BOTH)
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},1>:SDL::SDL>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},2>:SDL2::SDL2-static>
 			$<$<EQUAL:${FTE_ENGINE_SDL_VERSION_MAJOR},3>:SDL3::SDL3-static>
-			$<$<STREQUAL:${FTE_ENGINE_RENDERER},gl>:OpenGL::GL>
-			$<$<STREQUAL:${FTE_ENGINE_RENDERER},vk>:Vulkan::Vulkan>
+			$<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<STREQUAL:${FTE_ENGINE_RENDERER},gl>>:OpenGL::GL>
+			$<$<AND:$<NOT:$<BOOL:${EMSCRIPTEN}>>,$<STREQUAL:${FTE_ENGINE_RENDERER},vk>>:Vulkan::Vulkan>
 			$<$<BOOL:${WIN32}>:ws2_32>
 			$<$<BOOL:${WIN32}>:winmm>
 			$<$<BOOL:${WIN32}>:ole32>
@@ -303,6 +317,16 @@ if(FTE_ENGINE_BOTH)
 	target_link_options(fteqw
 		PRIVATE
 			$<$<AND:$<C_COMPILER_ID:GNU,Clang>,$<CONFIG:Release,MinSizeRel>>:-s>
+			$<$<BOOL:${EMSCRIPTEN}>:--pre-js ${FTE_ENGINE_WEB_DIR}/prejs.js>
+			$<$<BOOL:${EMSCRIPTEN}>:--js-library ${FTE_ENGINE_WEB_DIR}/ftejslib.js>
+			$<$<BOOL:${EMSCRIPTEN}>:-sLEGACY_GL_EMULATION=0>
+			$<$<BOOL:${EMSCRIPTEN}>:-sNO_FILESYSTEM=1>
+			$<$<BOOL:${EMSCRIPTEN}>:-sFILESYSTEM=0>
+			$<$<BOOL:${EMSCRIPTEN}>:-sALLOW_MEMORY_GROWTH=1>
+			$<$<BOOL:${EMSCRIPTEN}>:-sMAX_WEBGL_VERSION=2>
+			$<$<BOOL:${EMSCRIPTEN}>:-sTOTAL_STACK=5MB>
+			$<$<BOOL:${EMSCRIPTEN}>:-sERROR_ON_UNDEFINED_SYMBOLS=1>
+			$<$<BOOL:${EMSCRIPTEN}>:-sTOTAL_MEMORY=268435456>
 	)
 	set(CLIENT_NAME "fteqw" CACHE STRING "")
 	set_target_properties(fteqw

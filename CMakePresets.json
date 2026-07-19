@@ -28,6 +28,21 @@
 			"generator": "Xcode",
 			"condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" },
 			"binaryDir": "${sourceDir}/build"
+		},
+		{
+			"name": "emscripten",
+			"displayName": "Emscripten",
+			"binaryDir": "build-emscripten",
+			"toolchainFile": "$env{EMSCRIPTEN_ROOT}/cmake/Modules/Platform/Emscripten.cmake",
+			"cacheVariables": {
+				"FTE_ENGINE_SDL_VERSION_MAJOR": "0",
+				"FTE_PLUGINS": false,
+				"FTE_TOOLS": false,
+				"BUILD_SHARED_LIBS": false,
+				"FTE_VENDOR_DEPENDENCIES": false,
+				"FTE_ENGINE_SERVER": false,
+				"FTE_ENGINE_CLIENT": false
+			}
 		}
 	],
 	"buildPresets": [

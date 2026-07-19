@@ -133,7 +133,10 @@ set(USE_INTERNAL_ODE FALSE CACHE STRING "") #Statically link against ode physics
 set(NQPROT TRUE CACHE STRING "") #act as an nq client/server, with nq gamecode.
 set(HAVE_PACKET TRUE CACHE STRING "") #we can send unreliable messages!
 set(HAVE_TCP TRUE CACHE STRING "") #we can create/accept TCP connections.
-if(WIN32)
+if(EMSCRIPTEN)
+	set(HAVE_GNUTLS FALSE CACHE STRING "") #on linux
+	set(HAVE_WINSSPI FALSE CACHE STRING "") #on windows
+elseif(WIN32)
 	set(HAVE_GNUTLS FALSE CACHE STRING "") #on linux
 	set(HAVE_WINSSPI TRUE CACHE STRING "") #on windows
 else()
