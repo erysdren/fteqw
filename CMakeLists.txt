@@ -18,6 +18,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 cmake_policy(SET CMP0072 NEW)
 cmake_policy(SET CMP0135 NEW)
+cmake_policy(SET CMP0115 NEW)
 
 if(MINGW)
 	add_link_options(
