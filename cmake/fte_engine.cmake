@@ -252,7 +252,7 @@ set(FTE_ENGINE_CLIENT_SW_SOURCES
 	$<$<AND:$<NOT:$<BOOL:${FTE_ENGINE_USE_SDL}>>,$<BOOL:${DJGPP}>>:${FTE_ENGINE_SW_DIR}/sw_viddos.c>
 )
 
-if(FTE_ENGINE_BOTH)
+if(FTE_ENGINE_CLIENT)
 	add_executable(fteqw WIN32
 		${FTE_ENGINE_COMMON_SOURCES}
 		${FTE_ENGINE_SERVER_SOURCES}
@@ -375,7 +375,8 @@ if(FTE_ENGINE_SERVER)
 	)
 endif()
 
-if(FTE_ENGINE_CLIENT)
+# this is the old client-only engine code, i can't be bothered to fix it at the moment --erysdren
+if(0)
 	add_executable(fteqw-cl WIN32
 		${FTE_ENGINE_COMMON_SOURCES}
 		${FTE_ENGINE_SERVER_SOURCES}

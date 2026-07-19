@@ -62,9 +62,8 @@ cmake_dependent_option(FTE_PLUGIN_XMPP "Build XMPP plugin" ON FTE_PLUGINS OFF)
 cmake_dependent_option(FTE_PLUGIN_XSV "Build X11 server plugin" ON "FTE_PLUGINS;UNIX" OFF)
 
 option(FTE_ENGINE "Build engine" ON)
-cmake_dependent_option(FTE_ENGINE_BOTH "Build server+client engine" ON FTE_ENGINE OFF)
+cmake_dependent_option(FTE_ENGINE_CLIENT "Build server+client engine" ON FTE_ENGINE OFF)
 cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGINE OFF)
-cmake_dependent_option(FTE_ENGINE_CLIENT "Build client-only engine" OFF FTE_ENGINE OFF) # NOTE: currently broken
 
 option(FTE_VENDOR_DEPENDENCIES "Vendor all thirdparty dependencies" ON)
 
