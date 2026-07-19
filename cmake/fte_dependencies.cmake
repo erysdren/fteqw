@@ -30,6 +30,8 @@ if(FTE_PLUGIN_BOX3D)
 			GIT_REPOSITORY "https://github.com/erincatto/box3d.git"
 			GIT_TAG "v0.1.0"
 			EXCLUDE_FROM_ALL
+			GIT_SHALLOW TRUE
+			GIT_PROGRESS TRUE
 		)
 		FetchContent_MakeAvailable(box3d)
 	else()
@@ -59,6 +61,8 @@ if(FTE_PLUGIN_JOLT)
 		GIT_TAG "v5.5.0"
 		SOURCE_SUBDIR "Build"
 		EXCLUDE_FROM_ALL
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
 	)
 	FetchContent_MakeAvailable(JoltPhysics)
 endif()
@@ -68,6 +72,8 @@ if(FTE_PLUGIN_ODE)
 		GIT_REPOSITORY "https://bitbucket.org/odedevs/ode.git"
 		GIT_TAG "0.16.6"
 		EXCLUDE_FROM_ALL
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
 	)
 	set(ODE_DOUBLE_PRECISION OFF CACHE STRING "")
 	set(ODE_WITH_DEMOS OFF CACHE STRING "")
@@ -85,6 +91,8 @@ if(FTE_TOOL_HEIGHTMAPCONVERTER)
 		GIT_REPOSITORY "https://github.com/benhoyt/inih.git"
 		GIT_TAG "origin/master"
 		EXCLUDE_FROM_ALL
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
 	)
 	FetchContent_MakeAvailable(inih)
 endif()
@@ -103,6 +111,8 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-2.32.10"
 				EXCLUDE_FROM_ALL
+				GIT_SHALLOW TRUE
+				GIT_PROGRESS TRUE
 			)
 			FetchContent_MakeAvailable(SDL2)
 		else()
@@ -115,6 +125,8 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 				GIT_REPOSITORY "https://github.com/libsdl-org/SDL.git"
 				GIT_TAG "release-3.4.12"
 				EXCLUDE_FROM_ALL
+				GIT_SHALLOW TRUE
+				GIT_PROGRESS TRUE
 			)
 			FetchContent_MakeAvailable(SDL3)
 		else()
@@ -151,14 +163,12 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
 			URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
 			EXCLUDE_FROM_ALL
-			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Ogg)
 		FetchContent_Declare(Vorbis
 			URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
 			URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
 			EXCLUDE_FROM_ALL
-			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Vorbis)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
@@ -176,7 +186,6 @@ if(FTE_ENGINE_BOTH OR FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			URL "http://prdownloads.sourceforge.net/libpng/libpng-1.6.58.tar.gz?download"
 			URL_HASH MD5=40aaee5111ff68814d57351e68f15f29
 			EXCLUDE_FROM_ALL
-			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(PNG)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_PNGLIB LIBPNG_STATIC)
