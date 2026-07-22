@@ -169,12 +169,14 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 			URL "https://ftp.osuosl.org/pub/xiph/releases/ogg/libogg-1.3.6.tar.gz"
 			URL_HASH MD5=e2ab08345a440d32e88b2156cf499eb9
 			EXCLUDE_FROM_ALL
+			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Ogg)
 		FetchContent_Declare(Vorbis
 			URL "https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.7.tar.gz"
 			URL_HASH MD5=9b8034da6edc1a17d18b9bc4542015c7
 			EXCLUDE_FROM_ALL
+			FIND_PACKAGE_ARGS
 		)
 		FetchContent_MakeAvailable(Vorbis)
 		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_OGGVORBIS LIBVORBISFILE_STATIC)
