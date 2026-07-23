@@ -6,12 +6,14 @@ started work on July 4 2026
 
 /*
 # TODO
-## last updated 2025-07-04
+## last updated 2026-07-23
+- [ ] get it compiling (duh)
 */
 
 /*
 # CHANGELOG
-## last updated 2025-07-04
+## last updated 2026-07-23
+- 2026-07-23: actually started working on replacing Jolt stuff with Box3D stuff
 */
 
 #ifndef FTEPLUGIN
@@ -28,11 +30,13 @@ started work on July 4 2026
 #include "com_mesh.h"
 #include "com_bih.h"
 
-static plugthreadfuncs_t *threadfuncs = nullptr;
-static rbeplugfuncs_t *rbefuncs = nullptr;
-static cvar_t *physics_box3d_maxiterationsperframe = nullptr;
-static cvar_t *physics_box3d_framerate = nullptr;
-static cvar_t *pr_meshpitch = nullptr;
+#include <box3d/box3d.h>
+
+static plugthreadfuncs_t *threadfuncs = NULL;
+static rbeplugfuncs_t *rbefuncs = NULL;
+static cvar_t *physics_box3d_maxiterationsperframe = NULL;
+static cvar_t *physics_box3d_framerate = NULL;
+static cvar_t *pr_meshpitch = NULL;
 
 /* taken from VPhysics-Jolt */
 static const float InchesToMeters = 0.0254f;
@@ -40,6 +44,8 @@ static const float MetersToInches = 1.0f / 0.0254f;
 
 typedef struct box3dcontext {
 	rigidbodyengine_t funcs;
+	b3WorldDef worldDef;
+	b3WorldId worldId;
 	rbecommandqueue_t *cmdqueuehead;
 	rbecommandqueue_t *cmdqueuetail;
 } box3dcontext_t;
@@ -47,33 +53,34 @@ typedef struct box3dcontext {
 static void QDECL World_Box3D_End(world_t *world)
 {
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
+	b3DestroyWorld(ctx->worldId);
 	BZ_Free(ctx);
-	world->rbe = nullptr;
+	world->rbe = NULL;
 }
 
 static void QDECL World_Box3D_RemoveJointFromEntity(world_t *world, wedict_t *ed)
 {
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
+#if 0
 	if (ed->rbe.joint.joint)
 		 ctx->physics_system.RemoveConstraint((JPH::Constraint *)ed->rbe.joint.joint);
+#endif
 	ed->rbe.joint_type = 0;
-	ed->rbe.joint.joint = nullptr;
+	ed->rbe.joint.joint = NULL;
 }
 
 static void QDECL World_Box3D_RemoveFromEntity(world_t *world, wedict_t *ed)
 {
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
-	JPH::BodyInterface &body_interface = ctx->physics_system.GetBodyInterface();
-	JPH::Body *body;
-	JPH::Shape *geom;
+	b3BodyId *bodyId;
 
 	// not physics controlled
 	if (!ed->rbe.physics)
 		return;
 
-	body = (JPH::Body *)ed->rbe.body.body;
-	ed->rbe.body.body = nullptr;
-	if (body)
+	bodyId = (b3BodyId *)ed->rbe.body.body;
+	ed->rbe.body.body = NULL;
+	if (bodyId && b3Body_IsValid(*bodyId))
 	{
 #if 0
 		// remove constraints that use this body
@@ -85,26 +92,28 @@ static void QDECL World_Box3D_RemoveFromEntity(world_t *world, wedict_t *ed)
 			if (joint && (joint->v->enemy == NUM_FOR_EDICT(world->progs, ed) || joint->v->aiment == NUM_FOR_EDICT(world->progs, ed)))
 			{
 				ctx->physics_system.RemoveConstraint(constraint);
-				c = nullptr;
+				c = NULL;
 			}
 		}
 #endif
 
 		// remove body
-		body_interface.RemoveBody(body->GetID());
-		body_interface.DestroyBody(body->GetID());
+		b3DestroyBody(*bodyId);
+		BZ_Free(bodyId);
 	}
 
+#if 0
 	geom = (JPH::Shape *)ed->rbe.body.geom;
-	ed->rbe.body.geom = nullptr;
+	ed->rbe.body.geom = NULL;
 	if (ed->rbe.body.geom)
 	{
 		delete geom;
 	}
+#endif
 
 	// entity is not physics controlled, free any physics data
 	rbefuncs->ReleaseCollisionMesh(ed);
-	ed->rbe.massbuf = nullptr;
+	ed->rbe.massbuf = NULL;
 	ed->rbe.physics = qfalse;
 }
 
@@ -114,62 +123,45 @@ static void World_Box3D_RunCommand(world_t *world, rbecommandqueue_t *cmd)
 		return;
 
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
-	JPH::BodyInterface &body_interface = ctx->physics_system.GetBodyInterface();
-	JPH::Body *body = (JPH::Body *)cmd->edict->rbe.body.body;
-	const JPH::BodyID &body_id = body->GetID();
+	b3BodyId bodyId = *(b3BodyId *)cmd->edict->rbe.body.body;
 
 	switch (cmd->command)
 	{
 		case RBECMD_ENABLE:
 		{
-			body_interface.ActivateBody(body_id);
+			b3Body_EnableSleep(bodyId, false);
 			break;
 		}
 
 		case RBECMD_DISABLE:
 		{
-			body_interface.DeactivateBody(body_id);
+			b3Body_EnableSleep(bodyId, true);
 			break;
 		}
 
 		case RBECMD_FORCE:
 		{
-			// JPH::RVec3 center = body_interface.GetCenterOfMassPosition(body_id);
-			// JPH::RVec3 v2 = JPH::RVec3(cmd->v2[0], cmd->v2[1], cmd->v2[2]) * InchesToMeters;
-			// JPH::RVec3 pos = v2 - center;
-
-			body_interface.AddForce(body_id, JPH::Vec3Arg(cmd->v1[0], cmd->v1[1], cmd->v1[2]), JPH::RVec3(cmd->v2[0], cmd->v2[1], cmd->v2[2]) * InchesToMeters);
+			b3Body_ApplyForce(bodyId, (b3Vec3){cmd->v1[0], cmd->v1[1], cmd->v1[2]}, (b3Vec3){cmd->v2[0] * InchesToMeters, cmd->v2[1] * InchesToMeters, cmd->v2[2] * InchesToMeters}, false);
 			break;
 		}
 
 		case RBECMD_TORQUE:
 		{
-			body_interface.AddTorque(body_id, JPH::Vec3Arg(cmd->v1[0], cmd->v1[1], cmd->v1[2]));
+			b3Body_ApplyTorque(bodyId, (b3Vec3){cmd->v1[0], cmd->v1[1], cmd->v1[2]}, false);
 			break;
 		}
 	}
 }
 
-struct enumeratebrushes_userdata_t {
+typedef struct enumeratebrushes_userdata_s {
 	world_t *world;
 	model_t *model;
 	wedict_t *ed;
-	JPH::StaticCompoundShapeSettings static_compound_shape_settings;
-	JPH::Array<JPH::ConvexHullShapeSettings *> convex_hull_shape_settings;
-
-	enumeratebrushes_userdata_t() = default;
-	~enumeratebrushes_userdata_t() = default;
-#if 0
-	~enumeratebrushes_userdata_t()
-	{
-		for (auto &elem : convex_hull_shape_settings)
-			delete elem;
-	}
-#endif
-};
+} enumeratebrushes_userdata_t;
 
 static void QDECL EnumerateBrushes_Callback(model_t *model, q2cbrush_t *brush, void *user)
 {
+#if 0
 	enumeratebrushes_userdata_t *userdata = (enumeratebrushes_userdata_t *)user;
 	box3dcontext_t *ctx = (box3dcontext_t *)userdata->world->rbe;
 	JPH::BodyInterface &body_interface = ctx->physics_system.GetBodyInterface();
@@ -212,15 +204,12 @@ static void QDECL EnumerateBrushes_Callback(model_t *model, q2cbrush_t *brush, v
 
 	userdata->convex_hull_shape_settings.push_back(convex_hull_shape_settings);
 	userdata->static_compound_shape_settings.AddShape(JPH::Vec3::sZero(), JPH::Quat::sIdentity(), convex_hull_shape_settings);
+#endif
 }
 
 static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 {
-	JPH::Body *body = nullptr;
-	JPH::Shape *geom = nullptr;
-	JPH::MeshShapeSettings mesh_shape_settings;
-	JPH::ConvexHullShapeSettings convex_hull_shape_settings;
-	JPH::ShapeSettings *shape_settings = nullptr;
+	b3BodyId *bodyId;
 	enumeratebrushes_userdata_t enumeratebrushes_userdata;
 	vec3_t maxs;
 	vec3_t mins;
@@ -238,12 +227,11 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 	int geomtype = GEOMTYPE_SOLID;
 	vec_t scale = 1;
 	vec_t mass = 1;
-	model_t *model = nullptr;
+	model_t *model = NULL;
 	qboolean modified = qfalse;
 	int numbrushes = 0;
 
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
-	JPH::BodyInterface &body_interface = ctx->physics_system.GetBodyInterface();
 
 	// FIXME: find a better way to prevent this crash?
 	if (ed->v->movetype == MOVETYPE_NOCLIP)
@@ -301,7 +289,7 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 			model = world->Get_CModel(world, modelindex);
 			if (!model || model->loadstate != MLS_LOADED)
 			{
-				model = nullptr;
+				model = NULL;
 				modelindex = 0;
 			}
 			if (model)
@@ -365,7 +353,7 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 		VectorCopy(maxs, ed->rbe.maxs);
 		ed->rbe.modelindex = modelindex;
 		VectorAvg(mins, maxs, center);
-		ed->rbe.movelimit = std::min(size[0], std::min(size[1], size[2]));
+		ed->rbe.movelimit = min(size[0], min(size[1], size[2]));
 		ed->rbe.mass = mass;
 
 		switch (geomtype)
@@ -596,19 +584,19 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 	{
 		ed->rbe.mass = mass;
 
-		body = (JPH::Body *)ed->rbe.body.body;
-		if (body)
+		bodyId = (b3BodyId *)ed->rbe.body.body;
+		if (bodyId && b3Body_IsValid(*bodyId))
 		{
-			body_interface.RemoveBody(body->GetID());
-			body_interface.DestroyBody(body->GetID());
+			b3DestroyBody(*bodyId);
+			BZ_Free(bodyId);
 		}
 
-		ed->rbe.body.body = nullptr;
+		ed->rbe.body.body = NULL;
 	}
 
 	if (movetype == MOVETYPE_PHYSICS && ed->rbe.mass)
 	{
-		if (ed->rbe.body.body == nullptr)
+		if (ed->rbe.body.body == NULL)
 		{
 			// Con_Printf("created: %s\n", PR_GetString(world->progs, ed->v->classname));
 			// setup
@@ -641,7 +629,7 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 	}
 	else
 	{
-		if (ed->rbe.body.body == nullptr)
+		if (ed->rbe.body.body == NULL)
 		{
 			// Con_Printf("created: %s\n", PR_GetString(world->progs, ed->v->classname));
 			// setup
@@ -912,8 +900,9 @@ static void World_Box3D_BodyToEntity(world_t *world, wedict_t *ed)
 
 static void World_Box3D_JointFromEntity(world_t *world, wedict_t *ed)
 {
+#if 0
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
-	JPH::Constraint *joint = nullptr;
+	JPH::Constraint *joint = NULL;
 	int movetype = ed->v->movetype;
 	JPH::Body *enemybody, *aimentbody;
 	wedict_t *enemy, *aiment;
@@ -994,8 +983,8 @@ static void World_Box3D_JointFromEntity(world_t *world, wedict_t *ed)
 	{
 		joint = (JPH::Constraint *)ed->rbe.joint.joint;
 		ctx->physics_system.RemoveConstraint(joint);
-		ed->rbe.joint.joint = nullptr;
-		joint = nullptr;
+		ed->rbe.joint.joint = NULL;
+		joint = NULL;
 	}
 
 	JPH::Vec3 enemyorigin(enemy->v->origin[0], enemy->v->origin[1], enemy->v->origin[2]);
@@ -1074,10 +1063,12 @@ static void World_Box3D_JointFromEntity(world_t *world, wedict_t *ed)
 		joint->SetUserData(NUM_FOR_EDICT(world->progs, ed));
 		ctx->physics_system.AddConstraint(joint);
 	}
+#endif
 }
 
 static void QDECL World_Box3D_RunFrame(world_t *world, double frametime, double gravity)
 {
+	unsigned int i;
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
 
 	// no physics objects active
@@ -1088,10 +1079,10 @@ static void QDECL World_Box3D_RunFrame(world_t *world, double frametime, double 
 	if (physics_box3d_framerate->value <= 0)
 		cvarfuncs->SetFloat("physics_box3d_framerate", 60);
 	if (physics_box3d_maxiterationsperframe->value <= 0)
-		cvarfuncs->SetFloat("physics_box3d_maxiterationsperframe", 1);
+		cvarfuncs->SetFloat("physics_box3d_maxiterationsperframe", 4);
 
 	// copy physics properties from entities to physics engine
-	for (unsigned int i = 0; i < world->num_edicts; i++)
+	for (i = 0; i < world->num_edicts; i++)
 	{
 		wedict_t *ed = WEDICT_NUM_PB(world->progs, i);
 		if (!ED_ISFREE(ed))
@@ -1099,7 +1090,7 @@ static void QDECL World_Box3D_RunFrame(world_t *world, double frametime, double 
 	}
 
 	// oh, and it must be called after all bodies were created
-	for (unsigned int i = 0; i < world->num_edicts; i++)
+	for (i = 0; i < world->num_edicts; i++)
 	{
 		wedict_t *ed = WEDICT_NUM_PB(world->progs, i);
 		if (!ED_ISFREE(ed))
@@ -1112,19 +1103,19 @@ static void QDECL World_Box3D_RunFrame(world_t *world, double frametime, double 
 		rbecommandqueue_t *cmd = ctx->cmdqueuehead;
 		ctx->cmdqueuehead = cmd->next;
 		if (!cmd->next)
-			ctx->cmdqueuetail = nullptr;
+			ctx->cmdqueuetail = NULL;
 		World_Box3D_RunCommand(world, cmd);
 		BZ_Free(cmd);
 	}
 
 	// set gravity
-	ctx->physics_system.SetGravity(JPH::Vec3Arg(0, 0, -gravity * InchesToMeters));
+	b3World_SetGravity(ctx->worldId, (b3Vec3){0.0f, 0.0f, -gravity * InchesToMeters});
 
 	// step the world
-	ctx->physics_system.Update(1.0f/physics_box3d_framerate->value, physics_box3d_maxiterationsperframe->value, &ctx->temp_allocator, &ctx->job_system);
+	b3World_Step(ctx->worldId, 1.0f/physics_box3d_framerate->value, physics_box3d_maxiterationsperframe->value);
 
 	// copy physics properties from physics engine to entities
-	for (unsigned int i = 0; i < world->num_edicts; i++)
+	for (i = 0; i < world->num_edicts; i++)
 	{
 		wedict_t *ed = WEDICT_NUM_PB(world->progs, i);
 		if (!ED_ISFREE(ed))
@@ -1138,7 +1129,7 @@ static void QDECL World_Box3D_PushCommand(world_t *world, rbecommandqueue_t *val
 	rbecommandqueue_t *cmd = (rbecommandqueue_t *)BZ_Malloc(sizeof(*cmd));
 	world->rbe_hasphysicsents = qtrue;
 	memcpy(cmd, val, sizeof(*cmd));
-	cmd->next = nullptr;
+	cmd->next = NULL;
 	if (ctx->cmdqueuehead)
 	{
 		rbecommandqueue_t *oldtail = ctx->cmdqueuetail;
@@ -1152,6 +1143,9 @@ static void QDECL World_Box3D_PushCommand(world_t *world, rbecommandqueue_t *val
 
 static void QDECL World_Box3D_Trace(world_t *world, wedict_t *ed, vec3_t start, vec3_t end, trace_t *trace)
 {
+	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
+	memset(trace, 0, sizeof(*trace));
+#if 0
 	box3dcontext_t *ctx = (box3dcontext_t *)world->rbe;
 	const JPH::NarrowPhaseQuery &query = ctx->physics_system.GetNarrowPhaseQuery();
 	JPH::BodyInterface &body_interface = ctx->physics_system.GetBodyInterface();
@@ -1183,8 +1177,8 @@ static void QDECL World_Box3D_Trace(world_t *world, wedict_t *ed, vec3_t start, 
 
 			return true;
 		}
-		world_t *mWorld = nullptr;
-		wedict_t *mSelf = nullptr;
+		world_t *mWorld = NULL;
+		wedict_t *mSelf = NULL;
 		JPH::BodyInterface *mBodyInterface;
 	} body_filter;
 
@@ -1254,6 +1248,7 @@ static void QDECL World_Box3D_Trace(world_t *world, wedict_t *ed, vec3_t start, 
 
 		break;
 	}
+#endif
 }
 
 static void QDECL World_Box3D_Start(world_t *world)
@@ -1283,31 +1278,15 @@ static void QDECL World_Box3D_Start(world_t *world)
 	ctx->funcs.Trace = World_Box3D_Trace;
 	world->rbe = (rigidbodyengine_t *)ctx;
 
-	// init jobs system
-	// TODO: use FTE threads
-	ctx->job_system.Init(ctx->max_physics_jobs, ctx->max_physics_barriers);
-
-	// init physics system
-	ctx->physics_system.Init(
-		ctx->max_bodies,
-		ctx->num_body_mutexes,
-		ctx->max_body_pairs,
-		ctx->max_contact_constraints,
-		ctx->broad_phase_layer_interface,
-		ctx->object_vs_broadphase_layer_filter,
-		ctx->object_vs_object_layer_filter
-	);
+	// create world
+	ctx->worldDef = b3DefaultWorldDef();
+	ctx->worldId = b3CreateWorld(&ctx->worldDef);
 }
 
 static void QDECL Plug_Box3D_Shutdown(void)
 {
 	if (rbefuncs)
 		rbefuncs->UnregisterPhysicsEngine("Box3D");
-
-	// do this globally rather than per-context
-	JPH::UnregisterTypes();
-	delete JPH::Factory::sInstance;
-	JPH::Factory::sInstance = nullptr;
 }
 
 qboolean Plug_Init(void)
@@ -1343,7 +1322,7 @@ qboolean Plug_Init(void)
 	}
 
 	// get cvars
-	physics_box3d_maxiterationsperframe = cvarfuncs->GetNVFDG("physics_box3d_maxiterationsperframe", "1", 0, "Maximum times to run the simulation per frame", "Box3D");
+	physics_box3d_maxiterationsperframe = cvarfuncs->GetNVFDG("physics_box3d_maxiterationsperframe", "4", 0, "Maximum times to run the simulation per frame", "Box3D");
 	physics_box3d_framerate = cvarfuncs->GetNVFDG("physics_box3d_framerate", "60", 0, "Physics framerate", "Box3D");
 	pr_meshpitch = cvarfuncs->GetNVFDG("r_meshpitch", "-1", 0, "", "Box3D");
 	return qtrue;
