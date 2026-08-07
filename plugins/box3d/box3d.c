@@ -598,7 +598,6 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 	{
 		if (ed->rbe.body.body == NULL)
 		{
-			// Con_Printf("created: %s\n", PR_GetString(world->progs, ed->v->classname));
 			// setup
 			JPH::BodyCreationSettings body_creation_settings;
 			if (shape_settings)
@@ -613,13 +612,6 @@ static void World_Box3D_BodyFromEntity(world_t *world, wedict_t *ed)
 			// create body
 			body = body_interface.CreateBody(body_creation_settings);
 			body_interface.SetUserData(body->GetID(), NUM_FOR_EDICT(world->progs, ed));
-
-			//motion threshhold should be speed/physicsframerate.
-			//Threshhold enables CCD when the object moves faster than X
-			//FIXME: recalculate...
-			//body->setCcdMotionThreshold((geomsize[0]+geomsize[1]+geomsize[2])*(4/3));
-			//radius should be the body's radius, or smaller.
-			//body->setCcdSweptSphereRadius((geomsize[0]+geomsize[1]+geomsize[2])*(0.5/3));
 
 			// add to world
 			body_interface.AddBody(body->GetID(), JPH::EActivation::DontActivate);
