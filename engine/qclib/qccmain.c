@@ -80,6 +80,11 @@ pbool newstylesource;
 char		destfile[1024];		//the file we're going to output to
 pbool		destfile_explicit;		//destfile was override on the commandline, don't let qc change it.
 
+// ### erysdren: depfile support
+char depfile[1024];
+pbool write_depfile;
+// ###
+
 QCC_eval_basic_t		*qcc_pr_globals;
 unsigned int	numpr_globals;
 
@@ -1113,6 +1118,39 @@ static void QCC_DumpOpcodes (const char *outputname)
 		SafeWrite(h, line, strlen(line));
 		snprintf(line, sizeof(line), "};\n");
 		SafeWrite(h, line, strlen(line));
+	}
+	SafeClose(h);
+}
+
+static void QCC_WriteDepfile(qcc_cachedsourcefile_t *filelist, const char *outputname)
+{
+	char line[65536];
+	int h;
+	qcc_cachedsourcefile_t *f;
+
+	if (depfile[0])
+	{
+		snprintf(line, sizeof(line), "%s", depfile);
+	}
+	else
+	{
+		snprintf(line, sizeof(line), "%s.d", outputname);
+	}
+
+	h = SafeOpenWrite (line, 2*1024*1024);
+	if (h >= 0)
+	{
+		snprintf(line, sizeof(line), "%s: \\\n", outputname);
+		SafeWrite(h, line, strlen(line));
+
+		for (f = filelist; f; f = f->next)
+		{
+			if (!f->next)
+				snprintf(line, sizeof(line), "\t%s\n", f->filename);
+			else
+				snprintf(line, sizeof(line), "\t%s \\\n", f->filename);
+			SafeWrite(h, line, strlen(line));
+		}
 	}
 	SafeClose(h);
 }
@@ -2680,6 +2718,11 @@ strofs = (strofs+3)&~3;
 		QCC_DumpTags(destfile);
 	if (flag_dumpopcodes)
 		QCC_DumpOpcodes(destfile);
+
+	// ### erysdren: depfile support
+	if (write_depfile)
+		QCC_WriteDepfile(qcc_sourcefile, destfile);
+	// ###
 
 	switch(outputsttype)
 	{
@@ -5094,6 +5137,21 @@ static void QCC_PR_CommandLinePrecompilerOptions (void)
 		else if ( !strcmp(myargv[i], "-log") || !strcmp(myargv[i], "-nolog") )
 		{
 		}
+		// ### erysdren: depfile support
+		else if ( !strcmp(myargv[i], "-M") || !strcmp(myargv[i], "-MM") || !strcmp(myargv[i], "-MD") )
+		{
+			depfile[0] = '\0';
+			write_depfile = true;
+		}
+		else if ( !strcmp(myargv[i], "-MF") )
+		{
+			write_depfile = true;
+			if (++i == myargc)
+				QCC_PR_Warning(WARN_BADPARAMS, "cmdline", 0, "Missing value for %s arg", myargv[--i]);
+			else
+				QC_strlcpy(depfile, myargv[i], sizeof(depfile));
+		}
+		// ###
 		else if ( !strcmp(myargv[i], "-max_regs") || !strcmp(myargv[i], "-max_strings") || !strcmp(myargv[i], "-max_globals")
 		 || !strcmp(myargv[i], "-max_fields") || !strcmp(myargv[i], "-max_statements") || !strcmp(myargv[i], "-max_functions")
 		  || !strcmp(myargv[i], "-max_types") || !strcmp(myargv[i], "-max_temps") || !strcmp(myargv[i], "-max_macros") )
