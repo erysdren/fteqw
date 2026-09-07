@@ -66,6 +66,7 @@ cmake_dependent_option(FTE_ENGINE_CLIENT "Build server+client engine" ON FTE_ENG
 cmake_dependent_option(FTE_ENGINE_SERVER "Build server-only engine" ON FTE_ENGINE OFF)
 
 option(FTE_VENDOR_DEPENDENCIES "Vendor all thirdparty dependencies" ON)
+option(FTE_ENGINE_USE_FREETYPE "Use freetype for TTF fonts" ON)
 
 set(FTE_ENGINE_SDL_VERSION_MAJOR 3 CACHE STRING "Major SDL version to use for engine")
 set_property(CACHE FTE_ENGINE_SDL_VERSION_MAJOR PROPERTY STRINGS 0 1 2 3)

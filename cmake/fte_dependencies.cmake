@@ -148,13 +148,17 @@ if(FTE_ENGINE_CLIENT AND NOT EMSCRIPTEN)
 		find_package(Vulkan REQUIRED)
 	endif()
 	if(FTE_VENDOR_DEPENDENCIES)
-		FetchContent_Declare(Freetype
-			URL "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz"
-			URL_HASH MD5=c8333525a49e3caf08f427f1a4b01f35
-			EXCLUDE_FROM_ALL
-		)
-		FetchContent_MakeAvailable(Freetype)
-		list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE FREETYPE_STATIC)
+		if(FTE_ENGINE_USE_FREETYPE)
+			FetchContent_Declare(Freetype
+				URL "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.gz"
+				URL_HASH MD5=c8333525a49e3caf08f427f1a4b01f35
+				EXCLUDE_FROM_ALL
+			)
+			FetchContent_MakeAvailable(Freetype)
+			list(APPEND FTE_COMMON_DEFINITIONS AVAIL_FREETYPE FREETYPE_STATIC)
+		else()
+			list(APPEND FTE_COMMON_DEFINITIONS NO_FREETYPE)
+		endif()
 	else()
 		find_package(Freetype)
 		if(Freetype_FOUND)
